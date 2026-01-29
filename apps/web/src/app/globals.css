@@ -1,0 +1,708 @@
+@import "tailwindcss";
+
+/* ============================================
+   SYNAPSE DESIGN SYSTEM
+   "Boardroom Purity" - Deep Noir Aesthetic
+   ============================================ */
+
+@theme inline {
+  /* ===========================================
+     DEEP NOIR PALETTE
+     Premium obsidian foundations
+     =========================================== */
+  
+  /* Primary Backgrounds */
+  --color-void: #030712;
+  --color-obsidian: #050508;
+  --color-obsidian-elevated: #0A0A0F;
+  --color-obsidian-surface: #111118;
+  
+  /* Brand Accent - Intelligence Anchor */
+  --color-synapse-teal: #06B6D4;
+  --color-synapse-teal-muted: rgba(6, 182, 212, 0.15);
+  --color-synapse-teal-glow: rgba(6, 182, 212, 0.3);
+  
+  /* Secondary Accents */
+  --color-synapse-cyan: #22D3EE;
+  --color-synapse-emerald: #10B981;
+  --color-synapse-amber: #F59E0B;
+  --color-synapse-coral: #F87171;
+  
+  /* Semantic Colors */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-critical: #EF4444;
+  --color-info: #3B82F6;
+  
+  /* Text Hierarchy */
+  --color-white-pure: #FFFFFF;
+  --color-white-soft: rgba(255, 255, 255, 0.95);
+  --color-silver: #94A3B8;
+  --color-steel: #64748B;
+  --color-muted: rgba(255, 255, 255, 0.5);
+  
+  /* Glass Surfaces */
+  --glass-bg: rgba(10, 10, 15, 0.85);
+  --glass-bg-light: rgba(255, 255, 255, 0.03);
+  --glass-bg-card: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  --glass-blur: 16px;
+  --glass-blur-strong: 32px;
+  
+  /* ===========================================
+     PRECISION GEOMETRY
+     Sharp edges for institutional authority
+     =========================================== */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  
+  /* ===========================================
+     SHADOW STACKS
+     Multi-layered depth for premium lift
+     =========================================== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
+  
+  /* 3D Lift Shadow Stack */
+  --shadow-lift: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 20px 60px rgba(6, 182, 212, 0.1);
+  
+  /* Glow Effects */
+  --glow-teal: 0 0 40px rgba(6, 182, 212, 0.3);
+  --glow-teal-intense: 0 0 80px rgba(6, 182, 212, 0.4);
+  
+  /* ===========================================
+     TYPOGRAPHY SCALE
+     Institutional precision
+     =========================================== */
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  
+  /* ===========================================
+     MOTION & TRANSITIONS
+     Physics-based timing
+     =========================================== */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  
+  --transition-fast: 150ms var(--ease-smooth);
+  --transition-smooth: 300ms var(--ease-smooth);
+  --transition-slow: 500ms var(--ease-smooth);
+  
+  /* ===========================================
+     SPACING SYSTEM
+     8px grid with generous whitespace
+     =========================================== */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+}
+
+/* ===========================================
+   BASE LAYER
+   =========================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-obsidian);
+  color: var(--color-white-soft);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===========================================
+   ATMOSPHERIC BACKGROUND SYSTEM
+   5-Layer Deep Noir Environment
+   =========================================== */
+
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Layer 1: Base Gradient */
+.atmosphere::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(6, 182, 212, 0.08), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(6, 182, 212, 0.05), transparent 40%),
+    linear-gradient(180deg, var(--color-void) 0%, var(--color-obsidian) 50%, var(--color-void) 100%);
+}
+
+/* Layer 2: Kinetic Grid */
+.atmosphere::after {
+  content: '';
+  position: absolute;
+  inset: -100%;
+  background-image: 
+    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: grid-drift 120s linear infinite;
+}
+
+@keyframes grid-drift {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(80px, 80px); }
+}
+
+/* Noise Overlay */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ===========================================
+   GLASSMORPHISM UTILITIES
+   =========================================== */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+.glass-card {
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-smooth);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.glass-strong {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur-strong));
+  -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+  border: 1px solid var(--glass-border);
+}
+
+/* ===========================================
+   BUTTON SYSTEM
+   Premium sharp-edged buttons
+   =========================================== */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, var(--color-synapse-teal), #0891B2);
+  color: var(--color-void);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 0 20px var(--color-synapse-teal-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--glass-bg-light);
+  color: var(--color-white-soft);
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all var(--transition-smooth);
+}
+
+.btn-secondary:hover {
+  background: var(--glass-bg-card);
+  border-color: var(--color-synapse-teal);
+  color: var(--color-synapse-teal);
+}
+
+/* ===========================================
+   METRIC CARDS
+   Animated stats with kinetic counters
+   =========================================== */
+
+.metric-card {
+  background: var(--glass-bg-card);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: all var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-synapse-teal), var(--color-synapse-cyan));
+  opacity: 0;
+  transition: opacity var(--transition-smooth);
+}
+
+.metric-card:hover {
+  border-color: var(--glass-border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.metric-card:hover::before {
+  opacity: 1;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-white-pure);
+  line-height: 1;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: var(--color-steel);
+  margin-top: var(--space-sm);
+}
+
+.metric-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: var(--space-sm);
+}
+
+.metric-trend--up {
+  color: var(--color-success);
+}
+
+.metric-trend--down {
+  color: var(--color-critical);
+}
+
+/* ===========================================
+   DATA TABLES
+   High-density institutional tables
+   =========================================== */
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.data-table th {
+  padding: var(--space-md);
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-steel);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.data-table td {
+  padding: var(--space-md);
+  font-size: 0.875rem;
+  color: var(--color-white-soft);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.data-table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+  background: var(--glass-bg-light);
+}
+
+/* ===========================================
+   STATUS BADGES
+   Semantic color-coded indicators
+   =========================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+}
+
+.badge--success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge--warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge--critical {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-critical);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge--info {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--color-synapse-teal);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+/* ===========================================
+   SIDEBAR NAVIGATION
+   Persistent dark sidebar
+   =========================================== */
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: var(--color-obsidian);
+  border-right: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.sidebar-brand {
+  padding: var(--space-xl);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+.sidebar-group-title {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-steel);
+  margin-bottom: var(--space-sm);
+  padding: 0 var(--space-sm);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  color: var(--color-silver);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  margin-bottom: 2px;
+}
+
+.sidebar-link:hover {
+  background: var(--glass-bg-light);
+  color: var(--color-white-soft);
+}
+
+.sidebar-link--active {
+  background: var(--color-synapse-teal-muted);
+  color: var(--color-synapse-teal);
+}
+
+/* ===========================================
+   PIPELINE VISUALIZATION
+   Holographic data flow
+   =========================================== */
+
+.pipeline-node {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  position: relative;
+  transition: all var(--transition-smooth);
+}
+
+.pipeline-node--active {
+  border-color: var(--color-synapse-teal);
+  box-shadow: 
+    0 0 20px var(--color-synapse-teal-glow),
+    inset 0 0 20px rgba(6, 182, 212, 0.05);
+}
+
+.pipeline-node--active::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(45deg, var(--color-synapse-teal), transparent, var(--color-synapse-teal));
+  z-index: -1;
+  animation: node-pulse 2s ease-in-out infinite;
+  opacity: 0.5;
+}
+
+@keyframes node-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.pipeline-connector {
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-synapse-teal), rgba(6, 182, 212, 0.3));
+  position: relative;
+  overflow: hidden;
+}
+
+.pipeline-connector::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--color-synapse-cyan), transparent);
+  animation: data-flow 2s linear infinite;
+}
+
+@keyframes data-flow {
+  0% { left: -50%; }
+  100% { left: 150%; }
+}
+
+/* ===========================================
+   RADIAL GAUGE (Compliance Score)
+   =========================================== */
+
+.radial-gauge {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.radial-gauge svg {
+  transform: rotate(-90deg);
+}
+
+.radial-gauge-bg {
+  fill: none;
+  stroke: var(--glass-border);
+  stroke-width: 8;
+}
+
+.radial-gauge-value {
+  fill: none;
+  stroke: var(--color-synapse-teal);
+  stroke-width: 8;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px var(--color-synapse-teal-glow));
+  transition: stroke-dashoffset 1s var(--ease-smooth);
+}
+
+.radial-gauge-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===========================================
+   COMMAND PALETTE (⌘K)
+   =========================================== */
+
+.command-palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20vh;
+}
+
+.command-palette {
+  width: 100%;
+  max-width: 560px;
+  background: var(--color-obsidian-elevated);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl), var(--glow-teal);
+  overflow: hidden;
+}
+
+.command-palette-input {
+  width: 100%;
+  padding: var(--space-lg);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 1rem;
+  color: var(--color-white-soft);
+}
+
+.command-palette-input::placeholder {
+  color: var(--color-steel);
+}
+
+.command-palette-results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: var(--space-sm);
+}
+
+.command-palette-group-title {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-steel);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.command-palette-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px var(--space-md);
+  font-size: 0.875rem;
+  color: var(--color-silver);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.command-palette-item:hover,
+.command-palette-item--focused {
+  background: var(--color-synapse-teal-muted);
+  color: var(--color-white-soft);
+}
+
+/* ===========================================
+   SCROLLBAR STYLING
+   =========================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--glass-border-hover);
+}
+
+/* ===========================================
+   FOCUS STATES (Accessibility)
+   =========================================== */
+
+:focus-visible {
+  outline: 2px solid var(--color-synapse-teal);
+  outline-offset: 2px;
+}
+
+/* ===========================================
+   ANIMATION UTILITIES
+   =========================================== */
+
+.animate-fade-in {
+  animation: fadeIn 0.5s var(--ease-smooth);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s var(--ease-smooth);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s var(--ease-spring);
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
