@@ -3,602 +3,398 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
-    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-    Sankey, Layer, Rectangle
+    AreaChart, Area, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Treemap
 } from 'recharts';
 import {
-    FileText, Search, Filter, Download, ChevronDown, ChevronRight, ChevronUp,
-    AlertTriangle, CheckCircle, Clock, DollarSign, Users, Activity,
-    TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Eye, Flag,
-    Calendar, Building2, Stethoscope, Pill, Heart, Brain, Sparkles,
-    AlertCircle, XCircle, MoreHorizontal, ExternalLink
+    FileText, TrendingUp, TrendingDown, DollarSign, AlertTriangle, Search,
+    Filter, Download, Eye, ChevronRight, ChevronDown, ChevronUp, X, Sparkles,
+    Calendar, Clock, User, Building2, Activity, Zap, ArrowUpRight, ArrowDownRight,
+    BarChart2, PieChart as PieIcon, Layers, RefreshCw, SlidersHorizontal, Check,
+    AlertCircle, Info, ExternalLink, Brain, Target, GitBranch, Hash
 } from 'lucide-react';
 
 // ============================================================================
-// DEMO DATA - Claims Intelligence Dataset
+// PREMIUM DATA
 // ============================================================================
 
-const claimsKPIs = {
-    totalClaims: 12847,
-    totalClaimsChange: 8.3,
-    avgClaimAmount: 642,
-    avgClaimAmountChange: -2.1,
-    anomaliesDetected: 23,
-    anomaliesChange: 45,
-    pendingReview: 156,
-    processingTime: 4.2
-};
+const claimsTrendData = [
+    { month: 'Jan', medical: 4.2, pharmacy: 1.8, total: 6.0 },
+    { month: 'Feb', medical: 4.5, pharmacy: 1.7, total: 6.2 },
+    { month: 'Mar', medical: 4.8, pharmacy: 1.9, total: 6.7 },
+    { month: 'Apr', medical: 4.3, pharmacy: 2.1, total: 6.4 },
+    { month: 'May', medical: 4.9, pharmacy: 2.0, total: 6.9 },
+    { month: 'Jun', medical: 5.2, pharmacy: 2.2, total: 7.4 },
+    { month: 'Jul', medical: 4.8, pharmacy: 2.3, total: 7.1 },
+    { month: 'Aug', medical: 5.1, pharmacy: 2.4, total: 7.5 },
+    { month: 'Sep', medical: 5.4, pharmacy: 2.1, total: 7.5 },
+    { month: 'Oct', medical: 5.0, pharmacy: 2.5, total: 7.5 }
+];
+
+const anomalyBreakdown = [
+    { type: 'Duplicate Claims', count: 23, amount: 45230, severity: 'high', color: '#EF4444' },
+    { type: 'Unusual Charges', count: 18, amount: 89450, severity: 'medium', color: '#F97316' },
+    { type: 'Pattern Anomaly', count: 12, amount: 34200, severity: 'medium', color: '#FBBF24' },
+    { type: 'Provider Outlier', count: 8, amount: 67800, severity: 'high', color: '#EC4899' },
+    { type: 'Timing Anomaly', count: 15, amount: 23400, severity: 'low', color: '#8B5CF6' }
+];
+
+const categoryTreemap = [
+    { name: 'Inpatient', size: 2847234, fill: '#F59E0B' },
+    { name: 'Outpatient', size: 1523456, fill: '#8B5CF6' },
+    { name: 'Pharmacy', size: 1734567, fill: '#EC4899' },
+    { name: 'Professional', size: 987654, fill: '#06B6D4' },
+    { name: 'ER', size: 654321, fill: '#EF4444' },
+    { name: 'Lab', size: 345678, fill: '#10B981' },
+    { name: 'Imaging', size: 234567, fill: '#3B82F6' }
+];
 
 const claimsData = [
     {
-        id: 'CLM-2024-14892',
+        id: 'CLM-2024-78432',
         memberId: 'M-4521',
-        memberName: 'John D.',
-        serviceDate: '2024-12-15',
-        provider: 'Metro General Hospital',
-        providerType: 'Hospital Inpatient',
-        diagnosis: 'Acute Myocardial Infarction',
-        diagnosisCode: 'I21.9',
-        procedureCode: '92928',
-        billedAmount: 147892,
-        allowedAmount: 98450,
-        paidAmount: 78760,
-        memberResponsibility: 19690,
+        memberName: 'Rodriguez, Maria',
+        serviceDate: '2024-10-28',
+        provider: 'Memorial Hospital',
+        category: 'Inpatient',
+        procedure: 'Hip Replacement',
+        billed: 85420,
+        allowed: 72108,
+        paid: 57686,
         status: 'paid',
-        anomalyFlag: 'high_cost',
-        anomalyScore: 94
+        anomalyFlags: ['unusual'],
+        riskScore: 78,
+        daysToProcess: 12
     },
     {
-        id: 'CLM-2024-14567',
+        id: 'CLM-2024-78433',
         memberId: 'M-3287',
-        memberName: 'Sarah M.',
-        serviceDate: '2024-12-12',
-        provider: 'Oncology Specialists PC',
-        providerType: 'Specialist',
-        diagnosis: 'Malignant Neoplasm - Lung',
-        diagnosisCode: 'C34.90',
-        procedureCode: '96413',
-        billedAmount: 24567,
-        allowedAmount: 18234,
-        paidAmount: 14587,
-        memberResponsibility: 3647,
+        memberName: 'Chen, William',
+        serviceDate: '2024-10-27',
+        provider: 'CardioHealth Associates',
+        category: 'Professional',
+        procedure: 'Cardiac Catheterization',
+        billed: 42350,
+        allowed: 38500,
+        paid: 30800,
         status: 'paid',
-        anomalyFlag: null,
-        anomalyScore: 12
+        anomalyFlags: [],
+        riskScore: 45,
+        daysToProcess: 8
     },
     {
-        id: 'CLM-2024-14234',
-        memberId: 'M-1893',
-        memberName: 'Michael R.',
-        serviceDate: '2024-12-10',
-        provider: 'Advanced Dialysis Center',
-        providerType: 'Facility',
-        diagnosis: 'Chronic Kidney Disease Stage 4',
-        diagnosisCode: 'N18.4',
-        procedureCode: '90935',
-        billedAmount: 8945,
-        allowedAmount: 6234,
-        paidAmount: 4987,
-        memberResponsibility: 1247,
+        id: 'CLM-2024-78434',
+        memberId: 'M-7832',
+        memberName: 'Johnson, Patricia',
+        serviceDate: '2024-10-26',
+        provider: 'Oncology Specialists',
+        category: 'Professional',
+        procedure: 'Chemotherapy Administration',
+        billed: 28940,
+        allowed: 25200,
+        paid: 20160,
         status: 'paid',
-        anomalyFlag: 'frequency',
-        anomalyScore: 67
+        anomalyFlags: ['pattern'],
+        riskScore: 82,
+        daysToProcess: 6
     },
     {
-        id: 'CLM-2024-14101',
-        memberId: 'M-5621',
-        memberName: 'Emily T.',
-        serviceDate: '2024-12-08',
-        provider: 'Neurology Associates',
-        providerType: 'Specialist',
-        diagnosis: 'Multiple Sclerosis',
-        diagnosisCode: 'G35',
-        procedureCode: 'J2323',
-        billedAmount: 12456,
-        allowedAmount: 11234,
-        paidAmount: 8987,
-        memberResponsibility: 2247,
+        id: 'CLM-2024-78435',
+        memberId: 'M-2156',
+        memberName: 'Thompson, James',
+        serviceDate: '2024-10-25',
+        provider: 'Specialty Pharmacy Inc',
+        category: 'Pharmacy',
+        procedure: 'Ocrevus Injection',
+        billed: 34500,
+        allowed: 34500,
+        paid: 27600,
         status: 'pending',
-        anomalyFlag: 'specialty_drug',
-        anomalyScore: 78
+        anomalyFlags: ['duplicate'],
+        riskScore: 91,
+        daysToProcess: null
     },
     {
-        id: 'CLM-2024-13987',
-        memberId: 'M-2945',
-        memberName: 'Robert K.',
-        serviceDate: '2024-12-05',
-        provider: 'CardioHealth Clinic',
-        providerType: 'Specialist',
-        diagnosis: 'Congestive Heart Failure',
-        diagnosisCode: 'I50.9',
-        procedureCode: '93306',
-        billedAmount: 4567,
-        allowedAmount: 3456,
-        paidAmount: 2765,
-        memberResponsibility: 691,
+        id: 'CLM-2024-78436',
+        memberId: 'M-9443',
+        memberName: 'Davis, Robert',
+        serviceDate: '2024-10-24',
+        provider: 'Dialysis Center',
+        category: 'Outpatient',
+        procedure: 'Hemodialysis Session',
+        billed: 2850,
+        allowed: 2200,
+        paid: 1760,
         status: 'paid',
-        anomalyFlag: null,
-        anomalyScore: 8
+        anomalyFlags: [],
+        riskScore: 35,
+        daysToProcess: 4
     },
     {
-        id: 'CLM-2024-13854',
-        memberId: 'M-7823',
-        memberName: 'Lisa W.',
-        serviceDate: '2024-12-03',
-        provider: 'Mental Health Partners',
-        providerType: 'Behavioral Health',
-        diagnosis: 'Major Depressive Disorder',
-        diagnosisCode: 'F33.1',
-        procedureCode: '90837',
-        billedAmount: 285,
-        allowedAmount: 245,
-        paidAmount: 196,
-        memberResponsibility: 49,
+        id: 'CLM-2024-78437',
+        memberId: 'M-5521',
+        memberName: 'Wilson, Sarah',
+        serviceDate: '2024-10-23',
+        provider: 'Emergency Medical Center',
+        category: 'ER',
+        procedure: 'Emergency Room Visit',
+        billed: 8420,
+        allowed: 6500,
+        paid: 5200,
         status: 'paid',
-        anomalyFlag: null,
-        anomalyScore: 3
-    },
-    {
-        id: 'CLM-2024-13721',
-        memberId: 'M-4892',
-        memberName: 'David C.',
-        serviceDate: '2024-12-01',
-        provider: 'Express Pharmacy',
-        providerType: 'Pharmacy',
-        diagnosis: 'Type 2 Diabetes',
-        diagnosisCode: 'E11.9',
-        procedureCode: 'NDC-123',
-        billedAmount: 1847,
-        allowedAmount: 1456,
-        paidAmount: 1165,
-        memberResponsibility: 291,
-        status: 'paid',
-        anomalyFlag: 'duplicate',
-        anomalyScore: 89
-    },
-    {
-        id: 'CLM-2024-13598',
-        memberId: 'M-3156',
-        memberName: 'Amanda P.',
-        serviceDate: '2024-11-28',
-        provider: 'Orthopedic Surgical Center',
-        providerType: 'Ambulatory Surgery',
-        diagnosis: 'Lumbar Disc Herniation',
-        diagnosisCode: 'M51.16',
-        procedureCode: '63030',
-        billedAmount: 34567,
-        allowedAmount: 24890,
-        paidAmount: 19912,
-        memberResponsibility: 4978,
-        status: 'denied',
-        anomalyFlag: 'prior_auth',
-        anomalyScore: 95
+        anomalyFlags: ['unusual', 'timing'],
+        riskScore: 72,
+        daysToProcess: 15
     }
 ];
 
-const claimsByCategory = [
-    { name: 'Medical', value: 5847234, percent: 70.9, color: '#F59E0B' },
-    { name: 'Pharmacy', value: 1523892, percent: 18.5, color: '#8B5CF6' },
-    { name: 'Behavioral', value: 487234, percent: 5.9, color: '#06B6D4' },
-    { name: 'Dental', value: 248532, percent: 3.0, color: '#10B981' },
-    { name: 'Vision', value: 141000, percent: 1.7, color: '#64748B' }
+const kpiCards = [
+    { label: 'Total Claims YTD', value: 8247532, format: 'currency', trend: 4.5, icon: DollarSign, gradient: ['#F59E0B', '#EF4444'] },
+    { label: 'Claims Volume', value: 45892, format: 'number', trend: 8.2, icon: FileText, gradient: ['#8B5CF6', '#EC4899'] },
+    { label: 'Avg Processing Days', value: 7.2, format: 'decimal', trend: -12.5, icon: Clock, gradient: ['#06B6D4', '#3B82F6'] },
+    { label: 'Anomalies Detected', value: 76, format: 'number', trend: 15.3, icon: AlertTriangle, gradient: ['#EF4444', '#F97316'] }
 ];
-
-const claimsTrend = [
-    { month: 'Jul', claims: 1892, amount: 1234567, anomalies: 12 },
-    { month: 'Aug', claims: 2134, amount: 1456789, anomalies: 18 },
-    { month: 'Sep', claims: 1987, amount: 1345678, anomalies: 15 },
-    { month: 'Oct', claims: 2456, amount: 1678901, anomalies: 21 },
-    { month: 'Nov', claims: 2123, amount: 1523456, anomalies: 19 },
-    { month: 'Dec', claims: 2255, amount: 1587234, anomalies: 23 }
-];
-
-const anomalyTypes = [
-    { type: 'High Cost', count: 7, icon: DollarSign, color: '#EF4444' },
-    { type: 'Duplicate', count: 5, icon: AlertCircle, color: '#F59E0B' },
-    { type: 'Frequency', count: 4, icon: Activity, color: '#8B5CF6' },
-    { type: 'Prior Auth', count: 4, icon: Shield, color: '#06B6D4' },
-    { type: 'Specialty Drug', count: 3, icon: Pill, color: '#EC4899' }
-];
-
-import { Shield } from 'lucide-react';
-
-// Sankey data for claims flow
-const sankeyData = {
-    nodes: [
-        { name: 'Submitted' },
-        { name: 'Auto-Adjudicated' },
-        { name: 'Manual Review' },
-        { name: 'Paid' },
-        { name: 'Denied' },
-        { name: 'Pending' }
-    ],
-    links: [
-        { source: 0, target: 1, value: 8500 },
-        { source: 0, target: 2, value: 4347 },
-        { source: 1, target: 3, value: 8200 },
-        { source: 1, target: 4, value: 300 },
-        { source: 2, target: 3, value: 3800 },
-        { source: 2, target: 4, value: 391 },
-        { source: 2, target: 5, value: 156 }
-    ]
-};
-
-// ============================================================================
-// ANIMATION VARIANTS
-// ============================================================================
-
-const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
-};
-
-const stagger = {
-    visible: { transition: { staggerChildren: 0.06 } }
-};
 
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
-function formatCurrency(value: number, compact = false): string {
-    if (compact && Math.abs(value) >= 1_000_000) {
-        return `$${(value / 1_000_000).toFixed(1)}M`;
-    }
-    if (compact && Math.abs(value) >= 1_000) {
-        return `$${(value / 1_000).toFixed(0)}K`;
-    }
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: 0
-    }).format(value);
+function formatCurrency(value: number): string {
+    if (Math.abs(value) >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+    if (Math.abs(value) >= 1_000) return `$${(value / 1_000).toFixed(0)}K`;
+    return `$${value.toLocaleString()}`;
 }
 
-function formatNumber(value: number): string {
-    return new Intl.NumberFormat('en-US').format(value);
+function formatValue(value: number, format: string): string {
+    if (format === 'currency') return formatCurrency(value);
+    if (format === 'decimal') return value.toFixed(1);
+    return value.toLocaleString();
 }
 
 // ============================================================================
 // COMPONENTS
 // ============================================================================
 
-function ClaimStatusBadge({ status }: { status: string }) {
-    const configs: Record<string, { label: string; className: string; icon: React.ComponentType<{ className?: string }> }> = {
-        paid: { label: 'Paid', className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: CheckCircle },
-        pending: { label: 'Pending', className: 'bg-amber-500/10 text-amber-400 border-amber-500/20', icon: Clock },
-        denied: { label: 'Denied', className: 'bg-rose-500/10 text-rose-400 border-rose-500/20', icon: XCircle },
-        review: { label: 'In Review', className: 'bg-blue-500/10 text-blue-400 border-blue-500/20', icon: Eye }
-    };
-    const config = configs[status] || configs.pending;
-    const Icon = config.icon;
-
-    return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${config.className}`}>
-            <Icon className="w-3 h-3" />
-            {config.label}
-        </span>
-    );
-}
-
-function AnomalyBadge({ flag, score }: { flag: string | null; score: number }) {
-    if (!flag) return null;
-
-    const configs: Record<string, { label: string; className: string }> = {
-        high_cost: { label: 'High Cost', className: 'bg-rose-500/20 text-rose-400' },
-        duplicate: { label: 'Duplicate', className: 'bg-amber-500/20 text-amber-400' },
-        frequency: { label: 'Frequency', className: 'bg-purple-500/20 text-purple-400' },
-        prior_auth: { label: 'Prior Auth', className: 'bg-cyan-500/20 text-cyan-400' },
-        specialty_drug: { label: 'Specialty', className: 'bg-pink-500/20 text-pink-400' }
-    };
-    const config = configs[flag] || { label: flag, className: 'bg-slate-500/20 text-slate-400' };
-
-    return (
-        <div className="flex items-center gap-2">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${config.className}`}>
-                <AlertTriangle className="w-3 h-3" />
-                {config.label}
-            </span>
-            <span className={`text-xs font-mono ${score >= 80 ? 'text-rose-400' : score >= 50 ? 'text-amber-400' : 'text-slate-400'}`}>
-                {score}
-            </span>
-        </div>
-    );
-}
-
-function KPICard({
-    icon: Icon,
-    label,
-    value,
-    change,
-    format = 'number',
-    suffix = ''
-}: {
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    value: number;
-    change?: number;
-    format?: 'currency' | 'number' | 'percent';
-    suffix?: string;
+function GlassCard({ children, className = '', gradient = false }: {
+    children: React.ReactNode;
+    className?: string;
+    gradient?: boolean;
 }) {
-    const formattedValue = useMemo(() => {
-        if (format === 'currency') return formatCurrency(value, true);
-        if (format === 'percent') return `${value}`;
-        return formatNumber(value);
-    }, [value, format]);
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`
+                relative overflow-hidden rounded-2xl
+                bg-gradient-to-br from-white/[0.08] to-white/[0.02]
+                backdrop-blur-xl border border-white/[0.08]
+                shadow-2xl shadow-black/20
+                ${className}
+            `}
+        >
+            {gradient && (
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/5 to-transparent pointer-events-none" />
+            )}
+            {children}
+        </motion.div>
+    );
+}
 
-    const isPositive = change !== undefined && change < 0;
+function KPICard({ data, index }: { data: typeof kpiCards[0]; index: number }) {
+    const Icon = data.icon;
+    const isPositive = data.label.includes('Processing') ? data.trend < 0 : data.trend > 0;
+    const trendColor = data.label.includes('Anomalies')
+        ? (data.trend > 0 ? 'text-rose-400' : 'text-emerald-400')
+        : (isPositive ? 'text-emerald-400' : 'text-rose-400');
 
     return (
         <motion.div
-            variants={fadeInUp}
-            className="relative group p-5 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)] overflow-hidden"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: index * 0.1 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            className="relative p-5 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/[0.08] overflow-hidden cursor-pointer group"
         >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
                 <div className="flex items-center justify-between mb-3">
-                    <div className="p-2 rounded-lg bg-[var(--surface-secondary)]">
-                        <Icon className="w-4 h-4 text-[var(--text-secondary)]" />
+                    <div
+                        className="p-2 rounded-xl"
+                        style={{ background: `linear-gradient(135deg, ${data.gradient[0]}20, ${data.gradient[1]}20)` }}
+                    >
+                        <Icon className="w-4 h-4" style={{ color: data.gradient[0] }} />
                     </div>
-                    {change !== undefined && (
-                        <div className={`flex items-center gap-1 text-xs font-medium ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {isPositive ? <ArrowDownRight className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
-                            {Math.abs(change)}%
-                        </div>
-                    )}
+                    <span className={`flex items-center gap-1 text-xs font-medium ${trendColor}`}>
+                        {data.trend > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                        {Math.abs(data.trend)}%
+                    </span>
                 </div>
-                <div className="text-2xl font-semibold text-[var(--text-primary)] font-mono tracking-tight">
-                    {formattedValue}{suffix}
+                <div className="text-2xl font-bold text-[var(--text-primary)] mb-1">
+                    {formatValue(data.value, data.format)}
                 </div>
-                <div className="text-xs text-[var(--text-tertiary)] mt-1 uppercase tracking-wider">
-                    {label}
-                </div>
+                <div className="text-xs text-[var(--text-tertiary)]">{data.label}</div>
             </div>
         </motion.div>
     );
 }
 
-function ClaimsTable({ claims, onSelectClaim }: { claims: typeof claimsData; onSelectClaim: (claim: typeof claimsData[0]) => void }) {
-    const [sortField, setSortField] = useState<'serviceDate' | 'billedAmount' | 'anomalyScore'>('serviceDate');
-    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
-
-    const sortedClaims = useMemo(() => {
-        return [...claims].sort((a, b) => {
-            let aVal = a[sortField];
-            let bVal = b[sortField];
-            if (sortField === 'serviceDate') {
-                aVal = new Date(aVal as string).getTime();
-                bVal = new Date(bVal as string).getTime();
-            }
-            return sortDir === 'asc' ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
-        });
-    }, [claims, sortField, sortDir]);
-
-    const handleSort = (field: typeof sortField) => {
-        if (sortField === field) {
-            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-        } else {
-            setSortField(field);
-            setSortDir('desc');
-        }
+function AnomalyBadge({ type }: { type: string }) {
+    const styles: Record<string, { bg: string; text: string; icon: React.ReactNode }> = {
+        unusual: { bg: 'bg-amber-500/20', text: 'text-amber-400', icon: <AlertCircle className="w-3 h-3" /> },
+        duplicate: { bg: 'bg-rose-500/20', text: 'text-rose-400', icon: <Hash className="w-3 h-3" /> },
+        pattern: { bg: 'bg-purple-500/20', text: 'text-purple-400', icon: <GitBranch className="w-3 h-3" /> },
+        timing: { bg: 'bg-cyan-500/20', text: 'text-cyan-400', icon: <Clock className="w-3 h-3" /> }
     };
 
+    const style = styles[type] || styles.unusual;
+
     return (
-        <div className="overflow-x-auto">
-            <table className="w-full">
-                <thead>
-                    <tr className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider border-b border-[var(--border-primary)]">
-                        <th className="text-left py-3 px-4">Claim ID</th>
-                        <th className="text-left py-3 px-4">Member</th>
-                        <th className="text-left py-3 px-4 cursor-pointer hover:text-[var(--text-primary)]" onClick={() => handleSort('serviceDate')}>
-                            <div className="flex items-center gap-1">
-                                Service Date
-                                {sortField === 'serviceDate' && (sortDir === 'desc' ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />)}
-                            </div>
-                        </th>
-                        <th className="text-left py-3 px-4">Provider</th>
-                        <th className="text-left py-3 px-4">Diagnosis</th>
-                        <th className="text-right py-3 px-4 cursor-pointer hover:text-[var(--text-primary)]" onClick={() => handleSort('billedAmount')}>
-                            <div className="flex items-center justify-end gap-1">
-                                Billed
-                                {sortField === 'billedAmount' && (sortDir === 'desc' ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />)}
-                            </div>
-                        </th>
-                        <th className="text-right py-3 px-4">Paid</th>
-                        <th className="text-center py-3 px-4">Status</th>
-                        <th className="text-left py-3 px-4 cursor-pointer hover:text-[var(--text-primary)]" onClick={() => handleSort('anomalyScore')}>
-                            <div className="flex items-center gap-1">
-                                Anomaly
-                                {sortField === 'anomalyScore' && (sortDir === 'desc' ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />)}
-                            </div>
-                        </th>
-                        <th className="text-center py-3 px-4"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sortedClaims.map((claim) => (
-                        <tr
-                            key={claim.id}
-                            className="border-b border-[var(--border-primary)] hover:bg-white/[0.02] transition-colors cursor-pointer"
-                            onClick={() => onSelectClaim(claim)}
-                        >
-                            <td className="py-3 px-4">
-                                <span className="font-mono text-sm text-[var(--accent-primary)]">{claim.id}</span>
-                            </td>
-                            <td className="py-3 px-4">
-                                <div className="text-sm text-[var(--text-primary)]">{claim.memberName}</div>
-                                <div className="text-xs text-[var(--text-tertiary)]">{claim.memberId}</div>
-                            </td>
-                            <td className="py-3 px-4 text-sm text-[var(--text-secondary)]">
-                                {new Date(claim.serviceDate).toLocaleDateString()}
-                            </td>
-                            <td className="py-3 px-4">
-                                <div className="text-sm text-[var(--text-primary)] max-w-[180px] truncate">{claim.provider}</div>
-                                <div className="text-xs text-[var(--text-tertiary)]">{claim.providerType}</div>
-                            </td>
-                            <td className="py-3 px-4">
-                                <div className="text-sm text-[var(--text-secondary)] max-w-[160px] truncate">{claim.diagnosis}</div>
-                                <div className="text-xs text-[var(--text-tertiary)] font-mono">{claim.diagnosisCode}</div>
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                                <span className="font-mono text-sm text-[var(--text-primary)]">{formatCurrency(claim.billedAmount)}</span>
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                                <span className="font-mono text-sm text-[var(--text-primary)]">{formatCurrency(claim.paidAmount)}</span>
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                                <ClaimStatusBadge status={claim.status} />
-                            </td>
-                            <td className="py-3 px-4">
-                                <AnomalyBadge flag={claim.anomalyFlag} score={claim.anomalyScore} />
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                                <button className="p-1.5 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors">
-                                    <MoreHorizontal className="w-4 h-4 text-[var(--text-tertiary)]" />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${style.bg} ${style.text}`}>
+            {style.icon}
+            {type}
+        </span>
     );
 }
 
 function ClaimDetailPanel({ claim, onClose }: { claim: typeof claimsData[0]; onClose: () => void }) {
     return (
         <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 400 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="fixed right-0 top-0 h-full w-[480px] bg-[var(--surface-primary)] border-l border-[var(--border-primary)] shadow-2xl z-50 overflow-y-auto"
+            exit={{ opacity: 0, x: 400 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed right-0 top-0 h-full w-[480px] bg-[var(--surface-primary)] border-l border-white/10 z-50 overflow-y-auto shadow-2xl"
         >
-            <div className="p-6 border-b border-[var(--border-primary)] flex items-center justify-between">
-                <div>
-                    <h2 className="text-lg font-medium text-[var(--text-primary)]">Claim Details</h2>
-                    <p className="text-sm text-[var(--accent-primary)] font-mono">{claim.id}</p>
+            <div className="sticky top-0 bg-[var(--surface-primary)] border-b border-white/5 p-6 z-10">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <span className="text-xs text-[var(--text-tertiary)]">Claim Details</span>
+                        <h2 className="text-lg font-semibold text-[var(--text-primary)] font-mono">{claim.id}</h2>
+                    </div>
+                    <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <X className="w-5 h-5 text-[var(--text-tertiary)]" />
+                    </button>
                 </div>
-                <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--surface-secondary)] transition-colors">
-                    <XCircle className="w-5 h-5 text-[var(--text-secondary)]" />
-                </button>
             </div>
 
             <div className="p-6 space-y-6">
-                {/* Member Info */}
-                <div>
-                    <h3 className="text-xs uppercase text-[var(--text-tertiary)] tracking-wider mb-3">Member Information</h3>
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Name</span>
-                            <span className="text-[var(--text-primary)]">{claim.memberName}</span>
+                {/* AI Risk Assessment */}
+                <div className="p-4 rounded-xl bg-gradient-to-r from-[var(--accent-primary)]/10 to-transparent border border-[var(--accent-primary)]/20">
+                    <div className="flex items-center gap-2 mb-3">
+                        <Brain className="w-4 h-4 text-[var(--accent-primary)]" />
+                        <span className="text-sm font-medium text-[var(--text-primary)]">AI Risk Assessment</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs text-[var(--text-tertiary)]">Risk Score</span>
+                                <span className={`text-sm font-bold ${claim.riskScore >= 80 ? 'text-rose-400' :
+                                        claim.riskScore >= 60 ? 'text-amber-400' : 'text-emerald-400'
+                                    }`}>{claim.riskScore}</span>
+                            </div>
+                            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                    className={`h-full rounded-full ${claim.riskScore >= 80 ? 'bg-gradient-to-r from-rose-500 to-rose-400' :
+                                            claim.riskScore >= 60 ? 'bg-gradient-to-r from-amber-500 to-amber-400' :
+                                                'bg-gradient-to-r from-emerald-500 to-emerald-400'
+                                        }`}
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${claim.riskScore}%` }}
+                                    transition={{ duration: 1 }}
+                                />
+                            </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Member ID</span>
-                            <span className="text-[var(--text-primary)] font-mono">{claim.memberId}</span>
+                    </div>
+                    {claim.anomalyFlags.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                            {claim.anomalyFlags.map((flag) => (
+                                <AnomalyBadge key={flag} type={flag} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Member Info */}
+                <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
+                        <User className="w-4 h-4 text-[var(--text-tertiary)]" />
+                        Member Information
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="p-3 rounded-lg bg-white/5">
+                            <div className="text-xs text-[var(--text-tertiary)]">Member ID</div>
+                            <div className="text-sm font-mono text-[var(--text-primary)]">{claim.memberId}</div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-white/5">
+                            <div className="text-xs text-[var(--text-tertiary)]">Name</div>
+                            <div className="text-sm text-[var(--text-primary)]">{claim.memberName}</div>
                         </div>
                     </div>
                 </div>
 
-                {/* Service Info */}
-                <div>
-                    <h3 className="text-xs uppercase text-[var(--text-tertiary)] tracking-wider mb-3">Service Information</h3>
+                {/* Claim Info */}
+                <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-[var(--text-tertiary)]" />
+                        Claim Details
+                    </h3>
                     <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Date of Service</span>
-                            <span className="text-[var(--text-primary)]">{new Date(claim.serviceDate).toLocaleDateString()}</span>
+                        <div className="flex items-center justify-between py-2 border-b border-white/5">
+                            <span className="text-xs text-[var(--text-tertiary)]">Service Date</span>
+                            <span className="text-sm text-[var(--text-primary)]">{claim.serviceDate}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Provider</span>
-                            <span className="text-[var(--text-primary)] text-right max-w-[200px]">{claim.provider}</span>
+                        <div className="flex items-center justify-between py-2 border-b border-white/5">
+                            <span className="text-xs text-[var(--text-tertiary)]">Provider</span>
+                            <span className="text-sm text-[var(--text-primary)]">{claim.provider}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Provider Type</span>
-                            <span className="text-[var(--text-primary)]">{claim.providerType}</span>
+                        <div className="flex items-center justify-between py-2 border-b border-white/5">
+                            <span className="text-xs text-[var(--text-tertiary)]">Category</span>
+                            <span className="text-sm text-[var(--text-primary)]">{claim.category}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Diagnosis</span>
-                            <span className="text-[var(--text-primary)] text-right max-w-[200px]">{claim.diagnosis}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">ICD-10 Code</span>
-                            <span className="text-[var(--text-primary)] font-mono">{claim.diagnosisCode}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Procedure Code</span>
-                            <span className="text-[var(--text-primary)] font-mono">{claim.procedureCode}</span>
+                        <div className="flex items-center justify-between py-2 border-b border-white/5">
+                            <span className="text-xs text-[var(--text-tertiary)]">Procedure</span>
+                            <span className="text-sm text-[var(--text-primary)]">{claim.procedure}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Financial Info */}
-                <div>
-                    <h3 className="text-xs uppercase text-[var(--text-tertiary)] tracking-wider mb-3">Financial Breakdown</h3>
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Billed Amount</span>
-                            <span className="text-[var(--text-primary)] font-mono">{formatCurrency(claim.billedAmount)}</span>
+                <div className="space-y-3">
+                    <h3 className="text-sm font-medium text-[var(--text-primary)] flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-[var(--text-tertiary)]" />
+                        Financial Summary
+                    </h3>
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="p-3 rounded-lg bg-white/5 text-center">
+                            <div className="text-xs text-[var(--text-tertiary)]">Billed</div>
+                            <div className="text-lg font-bold text-[var(--text-primary)]">{formatCurrency(claim.billed)}</div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Allowed Amount</span>
-                            <span className="text-[var(--text-primary)] font-mono">{formatCurrency(claim.allowedAmount)}</span>
+                        <div className="p-3 rounded-lg bg-white/5 text-center">
+                            <div className="text-xs text-[var(--text-tertiary)]">Allowed</div>
+                            <div className="text-lg font-bold text-[var(--accent-primary)]">{formatCurrency(claim.allowed)}</div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Plan Paid</span>
-                            <span className="text-emerald-400 font-mono">{formatCurrency(claim.paidAmount)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                            <span className="text-[var(--text-secondary)]">Member Responsibility</span>
-                            <span className="text-amber-400 font-mono">{formatCurrency(claim.memberResponsibility)}</span>
-                        </div>
-                    </div>
-                    <div className="mt-4 p-3 rounded-lg bg-[var(--surface-secondary)]">
-                        <div className="flex justify-between text-sm font-medium">
-                            <span className="text-[var(--text-secondary)]">Network Discount</span>
-                            <span className="text-emerald-400 font-mono">
-                                -{formatCurrency(claim.billedAmount - claim.allowedAmount)}
-                                <span className="text-xs text-[var(--text-tertiary)] ml-1">
-                                    ({((1 - claim.allowedAmount / claim.billedAmount) * 100).toFixed(0)}%)
-                                </span>
-                            </span>
+                        <div className="p-3 rounded-lg bg-white/5 text-center">
+                            <div className="text-xs text-[var(--text-tertiary)]">Paid</div>
+                            <div className="text-lg font-bold text-emerald-400">{formatCurrency(claim.paid)}</div>
                         </div>
                     </div>
-                </div>
-
-                {/* Status & Anomaly */}
-                <div>
-                    <h3 className="text-xs uppercase text-[var(--text-tertiary)] tracking-wider mb-3">Status & Flags</h3>
-                    <div className="flex items-center gap-4">
-                        <ClaimStatusBadge status={claim.status} />
-                        {claim.anomalyFlag && (
-                            <AnomalyBadge flag={claim.anomalyFlag} score={claim.anomalyScore} />
-                        )}
-                    </div>
-                    {claim.anomalyFlag && (
-                        <div className="mt-3 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
-                            <div className="flex items-start gap-2">
-                                <AlertTriangle className="w-4 h-4 text-rose-400 mt-0.5" />
-                                <div>
-                                    <div className="text-sm font-medium text-rose-400">AI Anomaly Detection</div>
-                                    <div className="text-xs text-[var(--text-secondary)] mt-1">
-                                        This claim has been flagged for review based on pattern analysis.
-                                        Anomaly confidence score: {claim.anomalyScore}%
-                                    </div>
-                                </div>
-                            </div>
+                    <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs text-[var(--text-tertiary)]">Member Responsibility</span>
+                            <span className="text-sm font-bold text-rose-400">{formatCurrency(claim.allowed - claim.paid)}</span>
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-4">
-                    <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--accent-primary)] text-black text-sm font-medium hover:opacity-90 transition-opacity">
-                        <Eye className="w-4 h-4" />
-                        Full EOB
-                    </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-[var(--border-primary)] text-[var(--text-primary)] text-sm hover:bg-[var(--surface-secondary)] transition-colors">
-                        <Flag className="w-4 h-4" />
+                    <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-white/5 text-[var(--text-secondary)] text-sm hover:bg-white/10 transition-colors">
+                        <Target className="w-4 h-4" />
                         Flag for Review
+                    </button>
+                    <button className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[var(--accent-primary)] text-black text-sm font-medium hover:opacity-90 transition-opacity">
+                        <Sparkles className="w-4 h-4" />
+                        AI Analysis
                     </button>
                 </div>
             </div>
@@ -607,227 +403,335 @@ function ClaimDetailPanel({ claim, onClose }: { claim: typeof claimsData[0]; onC
 }
 
 // ============================================================================
-// MAIN PAGE COMPONENT
+// MAIN COMPONENT
 // ============================================================================
 
 export default function ClaimsIntelligencePage() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [anomalyFilter, setAnomalyFilter] = useState<boolean>(false);
     const [selectedClaim, setSelectedClaim] = useState<typeof claimsData[0] | null>(null);
-    const [dateRange, setDateRange] = useState('30d');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' }>({ key: 'serviceDate', direction: 'desc' });
+    const [filterCategory, setFilterCategory] = useState<string>('all');
 
-    const filteredClaims = useMemo(() => {
-        return claimsData.filter(claim => {
-            if (statusFilter !== 'all' && claim.status !== statusFilter) return false;
-            if (anomalyFilter && !claim.anomalyFlag) return false;
-            if (searchQuery) {
-                const q = searchQuery.toLowerCase();
-                return claim.id.toLowerCase().includes(q) ||
-                    claim.memberName.toLowerCase().includes(q) ||
-                    claim.provider.toLowerCase().includes(q) ||
-                    claim.diagnosis.toLowerCase().includes(q);
+    const filteredAndSortedClaims = useMemo(() => {
+        let result = [...claimsData];
+
+        // Filter by search
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            result = result.filter(c =>
+                c.id.toLowerCase().includes(query) ||
+                c.memberId.toLowerCase().includes(query) ||
+                c.memberName.toLowerCase().includes(query) ||
+                c.provider.toLowerCase().includes(query)
+            );
+        }
+
+        // Filter by category
+        if (filterCategory !== 'all') {
+            result = result.filter(c => c.category === filterCategory);
+        }
+
+        // Sort
+        result.sort((a, b) => {
+            const aValue = (a as Record<string, unknown>)[sortConfig.key];
+            const bValue = (b as Record<string, unknown>)[sortConfig.key];
+
+            if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
             }
-            return true;
+
+            const aStr = String(aValue);
+            const bStr = String(bValue);
+            return sortConfig.direction === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
         });
-    }, [searchQuery, statusFilter, anomalyFilter]);
+
+        return result;
+    }, [searchQuery, filterCategory, sortConfig]);
+
+    const handleSort = (key: string) => {
+        setSortConfig(prev => ({
+            key,
+            direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
+        }));
+    };
+
+    const SortIcon = ({ column }: { column: string }) => {
+        if (sortConfig.key !== column) return null;
+        return sortConfig.direction === 'desc' ?
+            <ChevronDown className="w-3 h-3" /> :
+            <ChevronUp className="w-3 h-3" />;
+    };
 
     return (
-        <div className="space-y-6">
-            {/* Page Header */}
-            <div className="flex items-center justify-between">
+        <div className="space-y-8">
+            {/* Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between"
+            >
                 <div>
-                    <h1 className="text-2xl font-semibold text-[var(--text-primary)] tracking-tight flex items-center gap-3">
-                        <FileText className="w-7 h-7 text-[var(--accent-primary)]" />
-                        Claims Intelligence
-                    </h1>
-                    <p className="text-[var(--text-secondary)] mt-1">
-                        AI-powered claims analysis with anomaly detection
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="relative">
+                            <FileText className="w-8 h-8 text-[var(--accent-primary)]" />
+                            <motion.div
+                                className="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full flex items-center justify-center"
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                            >
+                                <span className="text-[8px] font-bold text-white">!</span>
+                            </motion.div>
+                        </div>
+                        <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+                            Claims Intelligence
+                        </h1>
+                    </div>
+                    <p className="text-[var(--text-secondary)] flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
+                        AI-powered anomaly detection • Real-time analytics • Deep drill-down
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <select
-                        value={dateRange}
-                        onChange={(e) => setDateRange(e.target.value)}
-                        className="px-4 py-2.5 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm"
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[var(--text-secondary)] text-sm hover:bg-white/10 transition-colors"
                     >
-                        <option value="7d">Last 7 Days</option>
-                        <option value="30d">Last 30 Days</option>
-                        <option value="90d">Last 90 Days</option>
-                        <option value="ytd">Year to Date</option>
-                    </select>
-                    <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--accent-primary)] text-black text-sm font-medium hover:opacity-90 transition-opacity">
                         <Download className="w-4 h-4" />
-                        Export Claims
-                    </button>
+                        Export
+                    </motion.button>
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[var(--accent-primary)] to-amber-400 text-black text-sm font-medium shadow-lg shadow-amber-500/25"
+                    >
+                        <Zap className="w-4 h-4" />
+                        Run Analysis
+                    </motion.button>
                 </div>
-            </div>
+            </motion.div>
 
             {/* KPI Cards */}
-            <motion.div
-                variants={stagger}
-                initial="hidden"
-                animate="visible"
-                className="grid grid-cols-5 gap-4"
-            >
-                <KPICard
-                    icon={FileText}
-                    label="Total Claims"
-                    value={claimsKPIs.totalClaims}
-                    change={claimsKPIs.totalClaimsChange}
-                />
-                <KPICard
-                    icon={DollarSign}
-                    label="Avg Claim Amount"
-                    value={claimsKPIs.avgClaimAmount}
-                    change={claimsKPIs.avgClaimAmountChange}
-                    format="currency"
-                />
-                <KPICard
-                    icon={AlertTriangle}
-                    label="Anomalies Detected"
-                    value={claimsKPIs.anomaliesDetected}
-                    change={claimsKPIs.anomaliesChange}
-                />
-                <KPICard
-                    icon={Clock}
-                    label="Pending Review"
-                    value={claimsKPIs.pendingReview}
-                />
-                <KPICard
-                    icon={Activity}
-                    label="Avg Processing"
-                    value={claimsKPIs.processingTime}
-                    suffix=" days"
-                />
-            </motion.div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {kpiCards.map((kpi, index) => (
+                    <KPICard key={kpi.label} data={kpi} index={index} />
+                ))}
+            </div>
 
             {/* Charts Row */}
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* Claims Trend */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="lg:col-span-2 p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                >
+                <GlassCard className="lg:col-span-2 p-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-medium text-[var(--text-primary)]">Claims Trend</h2>
+                        <div>
+                            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Claims Trend</h2>
+                            <p className="text-sm text-[var(--text-tertiary)]">Medical vs Pharmacy spend by month</p>
+                        </div>
                         <div className="flex items-center gap-4 text-xs">
                             <span className="flex items-center gap-1.5">
-                                <span className="w-3 h-3 rounded-sm bg-[#F59E0B]" />
-                                Claims
+                                <span className="w-3 h-1 rounded bg-[var(--accent-primary)]" />
+                                Medical
                             </span>
                             <span className="flex items-center gap-1.5">
-                                <span className="w-3 h-3 rounded-sm bg-[#EF4444]" />
-                                Anomalies
+                                <span className="w-3 h-1 rounded bg-[#EC4899]" />
+                                Pharmacy
                             </span>
                         </div>
                     </div>
                     <div className="h-64">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={claimsTrend} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" vertical={false} />
+                            <AreaChart data={claimsTrendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="medicalGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.4} />
+                                        <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="pharmacyGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#EC4899" stopOpacity={0.4} />
+                                        <stop offset="95%" stopColor="#EC4899" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                 <XAxis dataKey="month" stroke="var(--text-tertiary)" fontSize={11} tickLine={false} axisLine={false} />
-                                <YAxis stroke="var(--text-tertiary)" fontSize={11} tickLine={false} axisLine={false} />
+                                <YAxis stroke="var(--text-tertiary)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}M`} />
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: 'var(--surface-secondary)',
-                                        border: '1px solid var(--border-primary)',
-                                        borderRadius: '8px',
+                                        backgroundColor: 'rgba(0,0,0,0.95)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '12px',
                                         fontSize: '12px'
                                     }}
+                                    formatter={(value) => value !== undefined ? [`$${value}M`, ''] : ['', '']}
                                 />
-                                <Area type="monotone" dataKey="claims" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.2} strokeWidth={2} />
-                                <Area type="monotone" dataKey="anomalies" stroke="#EF4444" fill="#EF4444" fillOpacity={0.1} strokeWidth={2} />
+                                <Area type="monotone" dataKey="medical" stroke="var(--accent-primary)" strokeWidth={3} fill="url(#medicalGradient)" />
+                                <Area type="monotone" dataKey="pharmacy" stroke="#EC4899" strokeWidth={3} fill="url(#pharmacyGradient)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
-                </motion.div>
+                </GlassCard>
 
-                {/* Anomaly Types */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                >
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-medium text-[var(--text-primary)]">Anomaly Types</h2>
-                        <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
+                {/* Anomaly Breakdown */}
+                <GlassCard className="p-6 ">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Anomalies Detected</h2>
+                            <p className="text-sm text-[var(--text-tertiary)]">AI-flagged claims</p>
+                        </div>
+                        <AlertTriangle className="w-5 h-5 text-rose-400" />
                     </div>
                     <div className="space-y-3">
-                        {anomalyTypes.map((anomaly) => {
-                            const Icon = anomaly.icon;
-                            return (
-                                <div key={anomaly.type} className="flex items-center justify-between p-3 rounded-lg bg-[var(--surface-secondary)]">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg" style={{ backgroundColor: `${anomaly.color}20` }}>
-                                            <Icon className="w-4 h-4" style={{ color: anomaly.color }} />
-                                        </div>
-                                        <span className="text-sm text-[var(--text-primary)]">{anomaly.type}</span>
-                                    </div>
-                                    <span className="text-lg font-semibold font-mono text-[var(--text-primary)]">{anomaly.count}</span>
+                        {anomalyBreakdown.map((item, index) => (
+                            <motion.div
+                                key={item.type}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.08 }}
+                                className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group"
+                            >
+                                <div className="w-2 h-8 rounded-full" style={{ backgroundColor: item.color }} />
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-sm text-[var(--text-primary)]">{item.type}</div>
+                                    <div className="text-xs text-[var(--text-tertiary)]">{item.count} claims</div>
                                 </div>
-                            );
-                        })}
+                                <div className="text-right">
+                                    <div className="text-sm font-mono text-[var(--accent-primary)]">{formatCurrency(item.amount)}</div>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </motion.div>
+                        ))}
                     </div>
-                </motion.div>
-            </div>
-
-            {/* Filters & Search */}
-            <div className="flex items-center gap-4">
-                <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
-                    <input
-                        type="text"
-                        placeholder="Search claims by ID, member, provider, or diagnosis..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm placeholder-[var(--text-tertiary)]"
-                    />
-                </div>
-                <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-4 py-2.5 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm"
-                >
-                    <option value="all">All Statuses</option>
-                    <option value="paid">Paid</option>
-                    <option value="pending">Pending</option>
-                    <option value="denied">Denied</option>
-                </select>
-                <button
-                    onClick={() => setAnomalyFilter(!anomalyFilter)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm transition-colors ${anomalyFilter
-                            ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                            : 'bg-[var(--surface-primary)] border-[var(--border-primary)] text-[var(--text-secondary)]'
-                        }`}
-                >
-                    <AlertTriangle className="w-4 h-4" />
-                    Anomalies Only
-                </button>
+                </GlassCard>
             </div>
 
             {/* Claims Table */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)] overflow-hidden"
-            >
-                <div className="p-4 border-b border-[var(--border-primary)] flex items-center justify-between">
-                    <h2 className="font-medium text-[var(--text-primary)]">
-                        Claims ({filteredClaims.length})
-                    </h2>
-                    <div className="text-xs text-[var(--text-tertiary)]">
-                        Click a row to view claim details
+            <GlassCard className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Claims Explorer</h2>
+                        <p className="text-sm text-[var(--text-tertiary)]">Click any claim to view details and AI analysis</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[var(--text-tertiary)]" />
+                            <input
+                                type="text"
+                                placeholder="Search claims..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-10 pr-4 py-2 w-64 rounded-xl bg-white/5 border border-white/10 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-[var(--accent-primary)]/50"
+                            />
+                        </div>
+                        <select
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-[var(--text-primary)] focus:outline-none"
+                        >
+                            <option value="all">All Categories</option>
+                            <option value="Inpatient">Inpatient</option>
+                            <option value="Outpatient">Outpatient</option>
+                            <option value="Pharmacy">Pharmacy</option>
+                            <option value="Professional">Professional</option>
+                            <option value="ER">ER</option>
+                        </select>
                     </div>
                 </div>
-                <ClaimsTable claims={filteredClaims} onSelectClaim={setSelectedClaim} />
-            </motion.div>
 
-            {/* Claim Detail Panel */}
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider border-b border-white/5">
+                                <th className="text-left py-3 px-4 cursor-pointer" onClick={() => handleSort('id')}>
+                                    <span className="flex items-center gap-1">Claim ID <SortIcon column="id" /></span>
+                                </th>
+                                <th className="text-left py-3 px-4 cursor-pointer" onClick={() => handleSort('memberName')}>
+                                    <span className="flex items-center gap-1">Member <SortIcon column="memberName" /></span>
+                                </th>
+                                <th className="text-left py-3 px-4 cursor-pointer" onClick={() => handleSort('serviceDate')}>
+                                    <span className="flex items-center gap-1">Service Date <SortIcon column="serviceDate" /></span>
+                                </th>
+                                <th className="text-left py-3 px-4">Provider</th>
+                                <th className="text-left py-3 px-4">Procedure</th>
+                                <th className="text-right py-3 px-4 cursor-pointer" onClick={() => handleSort('billed')}>
+                                    <span className="flex items-center justify-end gap-1">Billed <SortIcon column="billed" /></span>
+                                </th>
+                                <th className="text-right py-3 px-4 cursor-pointer" onClick={() => handleSort('paid')}>
+                                    <span className="flex items-center justify-end gap-1">Paid <SortIcon column="paid" /></span>
+                                </th>
+                                <th className="text-center py-3 px-4">Risk</th>
+                                <th className="text-center py-3 px-4">Flags</th>
+                                <th className="text-center py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredAndSortedClaims.map((claim, index) => (
+                                <motion.tr
+                                    key={claim.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.03 }}
+                                    className={`border-t border-white/5 hover:bg-white/[0.03] transition-colors cursor-pointer ${claim.anomalyFlags.length > 0 ? 'bg-rose-500/[0.02]' : ''
+                                        }`}
+                                    onClick={() => setSelectedClaim(claim)}
+                                >
+                                    <td className="py-4 px-4">
+                                        <span className="text-sm font-mono text-[var(--accent-primary)]">{claim.id}</span>
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <div>
+                                            <div className="text-sm text-[var(--text-primary)]">{claim.memberName}</div>
+                                            <div className="text-xs text-[var(--text-tertiary)]">{claim.memberId}</div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <span className="text-sm text-[var(--text-secondary)]">{claim.serviceDate}</span>
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <span className="text-sm text-[var(--text-secondary)] truncate max-w-[150px] block">{claim.provider}</span>
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <span className="text-sm text-[var(--text-secondary)]">{claim.procedure}</span>
+                                    </td>
+                                    <td className="py-4 px-4 text-right">
+                                        <span className="text-sm font-mono text-[var(--text-primary)]">{formatCurrency(claim.billed)}</span>
+                                    </td>
+                                    <td className="py-4 px-4 text-right">
+                                        <span className="text-sm font-mono text-emerald-400">{formatCurrency(claim.paid)}</span>
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        <div className="inline-flex items-center gap-1.5">
+                                            <div className={`w-2 h-2 rounded-full ${claim.riskScore >= 80 ? 'bg-rose-500' :
+                                                    claim.riskScore >= 60 ? 'bg-amber-500' : 'bg-emerald-500'
+                                                }`} />
+                                            <span className={`text-xs font-medium ${claim.riskScore >= 80 ? 'text-rose-400' :
+                                                    claim.riskScore >= 60 ? 'text-amber-400' : 'text-emerald-400'
+                                                }`}>{claim.riskScore}</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        {claim.anomalyFlags.length > 0 ? (
+                                            <div className="flex items-center justify-center gap-1">
+                                                {claim.anomalyFlags.map((flag) => (
+                                                    <AnomalyBadge key={flag} type={flag} />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span className="text-xs text-[var(--text-tertiary)]">—</span>
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setSelectedClaim(claim); }}
+                                            className="p-2 rounded-lg hover:bg-white/10 transition-colors group"
+                                        >
+                                            <Eye className="w-4 h-4 text-[var(--text-tertiary)] group-hover:text-[var(--accent-primary)]" />
+                                        </button>
+                                    </td>
+                                </motion.tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </GlassCard>
+
+            {/* Detail Panel */}
             <AnimatePresence>
                 {selectedClaim && (
                     <>
@@ -835,7 +739,7 @@ export default function ClaimsIntelligencePage() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/50 z-40"
+                            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
                             onClick={() => setSelectedClaim(null)}
                         />
                         <ClaimDetailPanel claim={selectedClaim} onClose={() => setSelectedClaim(null)} />

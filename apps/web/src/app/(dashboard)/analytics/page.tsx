@@ -1,390 +1,557 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
-    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-    ComposedChart, ReferenceLine
+    AreaChart, Area, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+    XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar
 } from 'recharts';
 import {
-    TrendingUp, TrendingDown, DollarSign, Users, Activity, Target,
-    AlertTriangle, CheckCircle, Brain, MessageSquare, Download, Filter,
-    Calendar, ChevronDown, ChevronRight, Sparkles, BarChart3, PieChart as PieChartIcon,
-    Layers, Shield, Pill, FileText, Zap, ArrowUpRight, ArrowDownRight,
-    Search, RefreshCw, Eye, Clock
+    TrendingUp, TrendingDown, DollarSign, Users, AlertTriangle, Target,
+    Zap, Brain, Sparkles, ArrowUpRight, ArrowDownRight, Activity, Shield,
+    ChevronRight, Eye, Layers, BarChart3, PieChart as PieIcon, Clock,
+    RefreshCw, Filter, Download, Share2, Maximize2, X, ArrowRight
 } from 'lucide-react';
 
 // ============================================================================
-// DEMO DATA - World-class analytics dataset
+// PREMIUM DATA
 // ============================================================================
 
-const executiveKPIs = {
-    totalSpend: 8_247_892,
-    totalSpendChange: -4.2,
-    pmpm: 487.32,
-    pmpmChange: 2.1,
-    claimsCount: 12_847,
-    claimsCountChange: 8.3,
-    memberCount: 1_412,
-    memberCountChange: 3.2,
-    stopLossUtilization: 67,
-    ibnrReserve: 892_450,
-    budgetVariance: -16.1,
-    highCostClaimants: 7
-};
+const executiveKPIs = [
+    {
+        id: 'total-spend',
+        title: 'Total Plan Spend',
+        value: 8247532,
+        previousValue: 7892145,
+        format: 'currency' as const,
+        trend: 'up',
+        trendPercent: 4.5,
+        sparkline: [65, 72, 68, 85, 78, 92, 88, 95],
+        gradient: ['#F59E0B', '#EF4444'],
+        insight: 'Trending 4.5% above prior year due to specialty pharmacy',
+        aiConfidence: 94
+    },
+    {
+        id: 'pmpm',
+        title: 'Current PMPM',
+        value: 542,
+        previousValue: 525,
+        format: 'currency' as const,
+        trend: 'up',
+        trendPercent: 3.2,
+        sparkline: [520, 515, 528, 535, 542, 538, 545, 542],
+        gradient: ['#8B5CF6', '#EC4899'],
+        insight: 'Within 2% of budget target, pharmacy driving variance',
+        aiConfidence: 91
+    },
+    {
+        id: 'members',
+        title: 'Active Members',
+        value: 12847,
+        previousValue: 12456,
+        format: 'number' as const,
+        trend: 'up',
+        trendPercent: 3.1,
+        sparkline: [12200, 12350, 12400, 12500, 12600, 12750, 12800, 12847],
+        gradient: ['#06B6D4', '#3B82F6'],
+        insight: 'Q4 open enrollment added 391 new members',
+        aiConfidence: 99
+    },
+    {
+        id: 'stop-loss',
+        title: 'Stop-Loss Utilization',
+        value: 78,
+        previousValue: 65,
+        format: 'percent' as const,
+        trend: 'up',
+        trendPercent: 20,
+        sparkline: [45, 52, 58, 62, 68, 72, 75, 78],
+        gradient: ['#EF4444', '#F97316'],
+        insight: '3 members projected to breach specific deductible',
+        aiConfidence: 87
+    }
+];
 
 const pmpmTrendData = [
-    { month: 'Jan 24', medical: 312, pharmacy: 124, dental: 38, admin: 15, total: 489, budget: 520 },
-    { month: 'Feb 24', medical: 298, pharmacy: 131, dental: 35, admin: 15, total: 479, budget: 520 },
-    { month: 'Mar 24', medical: 345, pharmacy: 118, dental: 42, admin: 15, total: 520, budget: 520 },
-    { month: 'Apr 24', medical: 289, pharmacy: 142, dental: 36, admin: 15, total: 482, budget: 520 },
-    { month: 'May 24', medical: 378, pharmacy: 128, dental: 44, admin: 15, total: 565, budget: 520 },
-    { month: 'Jun 24', medical: 356, pharmacy: 135, dental: 39, admin: 15, total: 545, budget: 520 },
-    { month: 'Jul 24', medical: 312, pharmacy: 141, dental: 37, admin: 15, total: 505, budget: 525 },
-    { month: 'Aug 24', medical: 298, pharmacy: 156, dental: 34, admin: 15, total: 503, budget: 525 },
-    { month: 'Sep 24', medical: 334, pharmacy: 148, dental: 41, admin: 15, total: 538, budget: 525 },
-    { month: 'Oct 24', medical: 367, pharmacy: 152, dental: 38, admin: 15, total: 572, budget: 525 },
-    { month: 'Nov 24', medical: 298, pharmacy: 147, dental: 35, admin: 15, total: 495, budget: 525 },
-    { month: 'Dec 24', medical: 312, pharmacy: 138, dental: 37, admin: 15, total: 502, budget: 525 },
+    { month: 'Jan', actual: 498, budget: 510, projected: null, lower: null, upper: null },
+    { month: 'Feb', actual: 512, budget: 515, projected: null, lower: null, upper: null },
+    { month: 'Mar', actual: 525, budget: 518, projected: null, lower: null, upper: null },
+    { month: 'Apr', actual: 518, budget: 520, projected: null, lower: null, upper: null },
+    { month: 'May', actual: 532, budget: 522, projected: null, lower: null, upper: null },
+    { month: 'Jun', actual: 545, budget: 525, projected: null, lower: null, upper: null },
+    { month: 'Jul', actual: 538, budget: 528, projected: null, lower: null, upper: null },
+    { month: 'Aug', actual: 552, budget: 530, projected: null, lower: null, upper: null },
+    { month: 'Sep', actual: 548, budget: 532, projected: null, lower: null, upper: null },
+    { month: 'Oct', actual: 542, budget: 535, projected: null, lower: null, upper: null },
+    { month: 'Nov', actual: null, budget: 538, projected: 555, lower: 545, upper: 565 },
+    { month: 'Dec', actual: null, budget: 540, projected: 562, lower: 548, upper: 576 }
 ];
 
 const costBreakdown = [
-    { name: 'Medical Claims', value: 5_847_234, color: '#F59E0B', percent: 70.9 },
-    { name: 'Pharmacy', value: 1_523_892, color: '#8B5CF6', percent: 18.5 },
-    { name: 'Dental/Vision', value: 487_234, color: '#06B6D4', percent: 5.9 },
-    { name: 'Admin Fees', value: 248_532, color: '#64748B', percent: 3.0 },
-    { name: 'Stop-Loss Premium', value: 141_000, color: '#10B981', percent: 1.7 },
-];
-
-const topCostDrivers = [
-    { category: 'Musculoskeletal', amount: 1_234_567, change: 12.4, claims: 342 },
-    { category: 'Cardiovascular', amount: 987_654, change: -5.2, claims: 187 },
-    { category: 'Oncology', amount: 876_543, change: 28.7, claims: 23 },
-    { category: 'Mental Health', amount: 654_321, change: 18.9, claims: 456 },
-    { category: 'Endocrine (GLP-1)', amount: 543_210, change: 67.3, claims: 89 },
-    { category: 'Respiratory', amount: 432_109, change: -2.1, claims: 234 },
-];
-
-const stopLossData = {
-    specific: {
-        attachment: 175000,
-        currentMax: 147892,
-        claimantsApproaching: 3,
-        utilized: 84.5
-    },
-    aggregate: {
-        attachment: 9_500_000,
-        currentTotal: 6_372_450,
-        monthsRemaining: 4,
-        utilized: 67.1
-    }
-};
-
-const highCostClaimants = [
-    { id: 'M-4521', diagnosis: 'Acute Myocardial Infarction', ytdClaims: 147892, riskScore: 94, trend: 'rising' },
-    { id: 'M-3287', diagnosis: 'Malignant Neoplasm - Lung', ytdClaims: 134567, riskScore: 89, trend: 'stable' },
-    { id: 'M-1893', diagnosis: 'Chronic Kidney Disease Stage 4', ytdClaims: 128934, riskScore: 87, trend: 'rising' },
-    { id: 'M-5621', diagnosis: 'Multiple Sclerosis', ytdClaims: 112456, riskScore: 82, trend: 'stable' },
-    { id: 'M-2945', diagnosis: 'Congestive Heart Failure', ytdClaims: 98234, riskScore: 78, trend: 'declining' },
+    { category: 'Inpatient', value: 2847234, percent: 34.5, color: '#F59E0B', trend: 8.2 },
+    { category: 'Outpatient', value: 1523456, percent: 18.5, color: '#8B5CF6', trend: -2.1 },
+    { category: 'Pharmacy', value: 1734567, percent: 21.0, color: '#EC4899', trend: 15.3 },
+    { category: 'Professional', value: 987654, percent: 12.0, color: '#06B6D4', trend: 3.4 },
+    { category: 'ER/Urgent', value: 654321, percent: 7.9, color: '#EF4444', trend: -5.2 },
+    { category: 'Other', value: 500300, percent: 6.1, color: '#64748B', trend: 1.8 }
 ];
 
 const aiInsights = [
     {
-        type: 'alert',
-        severity: 'high',
-        title: 'Stop-Loss Breach Risk',
-        message: '3 members within 15% of specific attachment. Consider care management intervention.',
-        action: 'View Members',
-        icon: AlertTriangle
+        id: 1,
+        type: 'critical',
+        title: 'Stop-Loss Breach Imminent',
+        description: 'Member M-4521 projected to exceed $275K specific deductible within 45 days based on current trajectory.',
+        action: 'Review Case',
+        savings: 45000,
+        confidence: 94,
+        timestamp: '2 hours ago'
     },
     {
-        type: 'insight',
-        severity: 'medium',
-        title: 'GLP-1 Spend Accelerating',
-        message: 'Pharmacy spend on GLP-1 medications up 67% YoY. Now represents 8.2% of total Rx spend.',
-        action: 'Analyze Impact',
-        icon: Pill
+        id: 2,
+        type: 'warning',
+        title: 'GLP-1 Spend Acceleration',
+        description: 'Ozempic/Wegovy utilization up 89% YoY. 23 new starts in Q4. Projected $312K annual impact.',
+        action: 'Analyze Trend',
+        savings: 156000,
+        confidence: 91,
+        timestamp: '6 hours ago'
     },
     {
+        id: 3,
         type: 'opportunity',
-        severity: 'low',
         title: 'Generic Substitution Opportunity',
-        message: 'AI identified $47,890 potential annual savings through generic alternatives.',
-        action: 'Review Savings',
-        icon: Sparkles
+        description: 'AI identified $127K in potential savings through therapeutic alternatives for 8 high-cost medications.',
+        action: 'View Details',
+        savings: 127000,
+        confidence: 88,
+        timestamp: '1 day ago'
     },
     {
-        type: 'compliance',
-        severity: 'medium',
-        title: 'MHPAEA Documentation Due',
-        message: 'Mental Health Parity comparative analysis due in 23 days.',
-        action: 'Start Analysis',
-        icon: Shield
+        id: 4,
+        type: 'positive',
+        title: 'Care Management ROI',
+        description: 'Diabetes management program showing 4.2x ROI. Hospital admits down 23% for enrolled members.',
+        action: 'Expand Program',
+        savings: 234000,
+        confidence: 96,
+        timestamp: '2 days ago'
     }
 ];
 
-const waterfallData = [
-    { name: 'Prior Year', value: 7_892_345, isTotal: true },
-    { name: 'Trend', value: 631_388, isPositive: false },
-    { name: 'Enrollment', value: 284_892, isPositive: false },
-    { name: 'Plan Changes', value: -189_234, isPositive: true },
-    { name: 'High-Cost Cases', value: 312_456, isPositive: false },
-    { name: 'Utilization', value: -178_432, isPositive: true },
-    { name: 'Network Savings', value: -234_891, isPositive: true },
-    { name: 'Current Year', value: 8_247_892, isTotal: true },
+const highCostMembers = [
+    { id: 'M-4521', riskScore: 94, ytdClaims: 248500, projected: 312000, trend: 'up', condition: 'Hemophilia A', intervention: 'Care Management' },
+    { id: 'M-7832', riskScore: 87, ytdClaims: 189200, projected: 245000, trend: 'up', condition: 'Cancer - Breast', intervention: 'Oncology Review' },
+    { id: 'M-2156', riskScore: 82, ytdClaims: 156800, projected: 198000, trend: 'stable', condition: 'Multiple Sclerosis', intervention: 'Specialty Pharmacy' },
+    { id: 'M-9443', riskScore: 78, ytdClaims: 142300, projected: 175000, trend: 'down', condition: 'ESRD', intervention: 'Transplant Eval' },
+    { id: 'M-3287', riskScore: 75, ytdClaims: 128900, projected: 158000, trend: 'up', condition: 'CHF', intervention: 'Remote Monitoring' }
 ];
 
 // ============================================================================
 // ANIMATION VARIANTS
 // ============================================================================
 
-const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: { staggerChildren: 0.08 }
+    }
+} as const;
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: { type: 'spring' as const, stiffness: 100, damping: 15 }
+    }
 };
 
-const stagger = {
-    visible: { transition: { staggerChildren: 0.06 } }
-};
-
-const pulse = {
-    scale: [1, 1.02, 1],
-    transition: { duration: 2, repeat: Infinity }
+const pulseVariants = {
+    pulse: {
+        scale: [1, 1.02, 1],
+        transition: { repeat: Infinity, duration: 2 }
+    }
 };
 
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
-function formatCurrency(value: number, compact = false): string {
-    if (compact && Math.abs(value) >= 1_000_000) {
-        return `$${(value / 1_000_000).toFixed(1)}M`;
+function formatCurrency(value: number): string {
+    if (Math.abs(value) >= 1_000_000) {
+        return `$${(value / 1_000_000).toFixed(2)}M`;
     }
-    if (compact && Math.abs(value) >= 1_000) {
+    if (Math.abs(value) >= 1_000) {
         return `$${(value / 1_000).toFixed(0)}K`;
     }
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        maximumFractionDigits: 0
-    }).format(value);
+    return `$${value.toLocaleString()}`;
 }
 
 function formatNumber(value: number): string {
-    return new Intl.NumberFormat('en-US').format(value);
+    return value.toLocaleString();
 }
 
 // ============================================================================
-// COMPONENTS
+// PREMIUM COMPONENTS
 // ============================================================================
 
-function KPICard({
-    icon: Icon,
-    label,
-    value,
-    change,
-    format = 'currency',
-    suffix = '',
-    description
-}: {
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-    value: number;
-    change?: number;
-    format?: 'currency' | 'number' | 'percent';
-    suffix?: string;
-    description?: string;
+function GlassCard({ children, className = '', gradient = false, glow = false }: {
+    children: React.ReactNode;
+    className?: string;
+    gradient?: boolean;
+    glow?: boolean;
 }) {
-    const formattedValue = useMemo(() => {
-        if (format === 'currency') return formatCurrency(value, true);
-        if (format === 'percent') return `${value}%`;
-        return formatNumber(value);
-    }, [value, format]);
-
-    const isPositive = change !== undefined && change < 0;
-
     return (
         <motion.div
-            variants={fadeInUp}
-            className="relative group p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)] overflow-hidden"
+            variants={itemVariants}
+            className={`
+                relative overflow-hidden rounded-2xl
+                bg-gradient-to-br from-white/[0.08] to-white/[0.02]
+                backdrop-blur-xl border border-white/[0.08]
+                ${glow ? 'shadow-[0_0_30px_rgba(245,158,11,0.15)]' : 'shadow-2xl shadow-black/20'}
+                ${className}
+            `}
         >
-            {/* Subtle gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-            <div className="relative">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="p-2 rounded-lg bg-[var(--surface-secondary)]">
-                        <Icon className="w-5 h-5 text-[var(--text-secondary)]" />
-                    </div>
-                    {change !== undefined && (
-                        <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-emerald-400' : 'text-rose-400'
-                            }`}>
-                            {isPositive ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
-                            {Math.abs(change)}%
-                        </div>
-                    )}
-                </div>
-
-                <div className="text-3xl font-semibold text-[var(--text-primary)] font-mono tracking-tight">
-                    {formattedValue}{suffix}
-                </div>
-
-                <div className="text-xs text-[var(--text-tertiary)] mt-2 uppercase tracking-wider">
-                    {label}
-                </div>
-
-                {description && (
-                    <div className="text-sm text-[var(--text-secondary)] mt-2">
-                        {description}
-                    </div>
-                )}
-            </div>
+            {gradient && (
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/5 to-transparent pointer-events-none" />
+            )}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.05),transparent_50%)] pointer-events-none" />
+            {children}
         </motion.div>
     );
 }
 
-function AIInsightCard({ insight }: { insight: typeof aiInsights[0] }) {
-    const Icon = insight.icon;
-    const severityColors = {
-        high: 'border-rose-500/30 bg-rose-500/5',
-        medium: 'border-amber-500/30 bg-amber-500/5',
-        low: 'border-emerald-500/30 bg-emerald-500/5'
+function AnimatedValue({ value, format }: { value: number; format: 'currency' | 'number' | 'percent' }) {
+    const [displayValue, setDisplayValue] = useState(0);
+
+    useEffect(() => {
+        const duration = 1500;
+        const steps = 60;
+        const stepValue = value / steps;
+        let current = 0;
+
+        const timer = setInterval(() => {
+            current += stepValue;
+            if (current >= value) {
+                setDisplayValue(value);
+                clearInterval(timer);
+            } else {
+                setDisplayValue(Math.floor(current));
+            }
+        }, duration / steps);
+
+        return () => clearInterval(timer);
+    }, [value]);
+
+    if (format === 'currency') return <>{formatCurrency(displayValue)}</>;
+    if (format === 'percent') return <>{displayValue}%</>;
+    return <>{formatNumber(displayValue)}</>;
+}
+
+function MiniSparkline({ data, gradient }: { data: number[]; gradient: string[] }) {
+    const max = Math.max(...data);
+    const min = Math.min(...data);
+    const range = max - min;
+    const height = 40;
+    const width = 100;
+
+    const points = data.map((value, index) => {
+        const x = (index / (data.length - 1)) * width;
+        const y = height - ((value - min) / range) * height;
+        return `${x},${y}`;
+    }).join(' ');
+
+    const gradientId = `sparkline-${gradient[0].replace('#', '')}`;
+
+    return (
+        <svg width={width} height={height} className="overflow-visible">
+            <defs>
+                <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor={gradient[0]} />
+                    <stop offset="100%" stopColor={gradient[1]} />
+                </linearGradient>
+            </defs>
+            <motion.polyline
+                fill="none"
+                stroke={`url(#${gradientId})`}
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={points}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 1.5, ease: 'easeOut' }}
+            />
+            {/* Glow effect */}
+            <motion.polyline
+                fill="none"
+                stroke={`url(#${gradientId})`}
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                points={points}
+                style={{ filter: 'blur(4px)' }}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 0.4 }}
+                transition={{ duration: 1.5, ease: 'easeOut' }}
+            />
+        </svg>
+    );
+}
+
+function ExecutiveKPICard({ kpi, index }: { kpi: typeof executiveKPIs[0]; index: number }) {
+    const [isHovered, setIsHovered] = useState(false);
+    const [showInsight, setShowInsight] = useState(false);
+
+    return (
+        <GlassCard gradient glow={kpi.id === 'stop-loss' && kpi.value > 75}>
+            <motion.div
+                className="p-6 cursor-pointer"
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
+                onClick={() => setShowInsight(!showInsight)}
+            >
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <div
+                            className="w-2 h-2 rounded-full animate-pulse"
+                            style={{ backgroundColor: kpi.gradient[0] }}
+                        />
+                        <span className="text-sm text-[var(--text-secondary)] font-medium">{kpi.title}</span>
+                    </div>
+                    <motion.div
+                        animate={{ rotate: isHovered ? 45 : 0 }}
+                        className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                        <ArrowUpRight className="w-4 h-4 text-[var(--text-tertiary)]" />
+                    </motion.div>
+                </div>
+
+                {/* Value */}
+                <div className="flex items-end justify-between mb-4">
+                    <div>
+                        <div className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+                            <AnimatedValue value={kpi.value} format={kpi.format} />
+                        </div>
+                        <div className={`flex items-center gap-1.5 mt-1 text-sm ${kpi.trend === 'up' ? (kpi.id === 'stop-loss' ? 'text-rose-400' : 'text-emerald-400') : 'text-emerald-400'
+                            }`}>
+                            {kpi.trend === 'up' ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                            <span className="font-medium">{kpi.trendPercent}%</span>
+                            <span className="text-[var(--text-tertiary)]">vs PY</span>
+                        </div>
+                    </div>
+                    <MiniSparkline data={kpi.sparkline} gradient={kpi.gradient} />
+                </div>
+
+                {/* AI Insight Pill */}
+                <AnimatePresence>
+                    {(isHovered || showInsight) && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="pt-4 border-t border-white/5"
+                        >
+                            <div className="flex items-start gap-2">
+                                <Sparkles className="w-4 h-4 text-[var(--accent-primary)] mt-0.5 flex-shrink-0" />
+                                <div>
+                                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{kpi.insight}</p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <span className="text-[10px] text-[var(--text-tertiary)]">AI Confidence</span>
+                                        <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                                            <motion.div
+                                                className="h-full rounded-full"
+                                                style={{ background: `linear-gradient(90deg, ${kpi.gradient[0]}, ${kpi.gradient[1]})` }}
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${kpi.aiConfidence}%` }}
+                                                transition={{ duration: 1, delay: 0.3 }}
+                                            />
+                                        </div>
+                                        <span className="text-[10px] font-mono text-[var(--accent-primary)]">{kpi.aiConfidence}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
+        </GlassCard>
+    );
+}
+
+function AIInsightCard({ insight, index }: { insight: typeof aiInsights[0]; index: number }) {
+    const typeStyles = {
+        critical: { bg: 'bg-rose-500/10', border: 'border-rose-500/20', icon: AlertTriangle, iconColor: 'text-rose-400' },
+        warning: { bg: 'bg-amber-500/10', border: 'border-amber-500/20', icon: Zap, iconColor: 'text-amber-400' },
+        opportunity: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', icon: Target, iconColor: 'text-cyan-400' },
+        positive: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', icon: TrendingUp, iconColor: 'text-emerald-400' }
     };
-    const iconColors = {
-        high: 'text-rose-400',
-        medium: 'text-amber-400',
-        low: 'text-emerald-400'
-    };
-    const severity = insight.severity as keyof typeof severityColors;
+
+    const style = typeStyles[insight.type as keyof typeof typeStyles];
+    const Icon = style.icon;
 
     return (
         <motion.div
-            variants={fadeInUp}
-            className={`p-4 rounded-lg border ${severityColors[severity]} group cursor-pointer hover:bg-white/[0.02] transition-colors`}
+            variants={itemVariants}
+            whileHover={{ x: 4, scale: 1.01 }}
+            className={`p-4 rounded-xl ${style.bg} border ${style.border} cursor-pointer group`}
         >
             <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-lg bg-[var(--surface-secondary)] ${iconColors[severity]}`}>
+                <div className={`p-2 rounded-lg bg-black/20 ${style.iconColor}`}>
                     <Icon className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-[var(--text-primary)]">{insight.title}</div>
-                    <div className="text-xs text-[var(--text-secondary)] mt-1 line-clamp-2">{insight.message}</div>
-                    <button className="text-xs text-[var(--accent-primary)] mt-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                        {insight.action} <ChevronRight className="w-3 h-3" />
-                    </button>
+                    <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-sm font-medium text-[var(--text-primary)] truncate">{insight.title}</h4>
+                        <span className="text-[10px] text-[var(--text-tertiary)]">{insight.timestamp}</span>
+                    </div>
+                    <p className="text-xs text-[var(--text-secondary)] line-clamp-2 mb-3">{insight.description}</p>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-mono text-[var(--accent-primary)]">
+                                {formatCurrency(insight.savings)} potential
+                            </span>
+                            <span className="text-[10px] text-[var(--text-tertiary)]">
+                                {insight.confidence}% confidence
+                            </span>
+                        </div>
+                        <button className="flex items-center gap-1 text-xs text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transition-opacity">
+                            {insight.action}
+                            <ChevronRight className="w-3 h-3" />
+                        </button>
+                    </div>
                 </div>
             </div>
         </motion.div>
     );
 }
 
-function StopLossGauge({ type, data }: { type: 'specific' | 'aggregate'; data: typeof stopLossData.specific | typeof stopLossData.aggregate }) {
-    const percentage = data.utilized;
-    const circumference = 2 * Math.PI * 45;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-    const getColor = (pct: number) => {
-        if (pct >= 90) return '#EF4444';
-        if (pct >= 75) return '#F59E0B';
-        return '#10B981';
-    };
+function CircularProgress({ value, size = 120, strokeWidth = 10, gradient }: {
+    value: number;
+    size?: number;
+    strokeWidth?: number;
+    gradient: string[];
+}) {
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (value / 100) * circumference;
+    const gradientId = `circular-${gradient[0].replace('#', '')}`;
 
     return (
-        <div className="flex items-center gap-4">
-            <div className="relative w-28 h-28">
-                <svg className="w-full h-full transform -rotate-90">
-                    <circle
-                        cx="56"
-                        cy="56"
-                        r="45"
-                        fill="none"
-                        stroke="var(--border-primary)"
-                        strokeWidth="8"
-                    />
-                    <motion.circle
-                        cx="56"
-                        cy="56"
-                        r="45"
-                        fill="none"
-                        stroke={getColor(percentage)}
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                        strokeDasharray={circumference}
-                        initial={{ strokeDashoffset: circumference }}
-                        animate={{ strokeDashoffset }}
-                        transition={{ duration: 1, ease: 'easeOut' }}
-                    />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold font-mono text-[var(--text-primary)]">
-                        {percentage.toFixed(0)}%
-                    </span>
-                </div>
-            </div>
-            <div className="flex-1">
-                <div className="text-sm font-medium text-[var(--text-primary)] capitalize mb-2">
-                    {type} Stop-Loss
-                </div>
-                <div className="space-y-1 text-xs text-[var(--text-secondary)]">
-                    <div className="flex justify-between">
-                        <span>Attachment:</span>
-                        <span className="font-mono">{formatCurrency('attachment' in data ? data.attachment : 0, true)}</span>
-                    </div>
-                    {'currentMax' in data && (
-                        <div className="flex justify-between">
-                            <span>Current Max:</span>
-                            <span className="font-mono">{formatCurrency(data.currentMax, true)}</span>
-                        </div>
-                    )}
-                    {'currentTotal' in data && (
-                        <div className="flex justify-between">
-                            <span>YTD Total:</span>
-                            <span className="font-mono">{formatCurrency(data.currentTotal, true)}</span>
-                        </div>
-                    )}
-                </div>
+        <div className="relative" style={{ width: size, height: size }}>
+            <svg width={size} height={size} className="transform -rotate-90">
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={gradient[0]} />
+                        <stop offset="100%" stopColor={gradient[1]} />
+                    </linearGradient>
+                    <filter id="glow">
+                        <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                        <feMerge>
+                            <feMergeNode in="coloredBlur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                </defs>
+                {/* Background circle */}
+                <circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.05)"
+                    strokeWidth={strokeWidth}
+                />
+                {/* Progress circle */}
+                <motion.circle
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    fill="none"
+                    stroke={`url(#${gradientId})`}
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                    strokeDasharray={circumference}
+                    initial={{ strokeDashoffset: circumference }}
+                    animate={{ strokeDashoffset: offset }}
+                    transition={{ duration: 1.5, ease: 'easeOut' }}
+                    filter="url(#glow)"
+                />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-[var(--text-primary)]">{value}%</span>
+                <span className="text-[10px] text-[var(--text-tertiary)]">Utilized</span>
             </div>
         </div>
     );
 }
 
-function HighCostClaimantRow({ claimant }: { claimant: typeof highCostClaimants[0] }) {
-    const trendColors = {
-        rising: 'text-rose-400',
-        stable: 'text-amber-400',
-        declining: 'text-emerald-400'
-    };
-    const trendIcons = {
-        rising: TrendingUp,
-        stable: Activity,
-        declining: TrendingDown
-    };
-    const TrendIcon = trendIcons[claimant.trend as keyof typeof trendIcons];
+function DrillDownModal({ data, onClose }: { data: typeof costBreakdown[0] | null; onClose: () => void }) {
+    if (!data) return null;
 
     return (
-        <tr className="border-t border-[var(--border-primary)] hover:bg-white/[0.02] transition-colors">
-            <td className="py-3 px-4">
-                <span className="font-mono text-sm text-[var(--text-primary)]">{claimant.id}</span>
-            </td>
-            <td className="py-3 px-4">
-                <span className="text-sm text-[var(--text-secondary)]">{claimant.diagnosis}</span>
-            </td>
-            <td className="py-3 px-4 text-right">
-                <span className="font-mono text-sm text-[var(--text-primary)]">{formatCurrency(claimant.ytdClaims)}</span>
-            </td>
-            <td className="py-3 px-4 text-center">
-                <span className={`inline-flex items-center justify-center w-10 h-6 rounded-full text-xs font-medium ${claimant.riskScore >= 90 ? 'bg-rose-500/20 text-rose-400' :
-                    claimant.riskScore >= 80 ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-emerald-500/20 text-emerald-400'
-                    }`}>
-                    {claimant.riskScore}
-                </span>
-            </td>
-            <td className="py-3 px-4 text-center">
-                <TrendIcon className={`w-4 h-4 mx-auto ${trendColors[claimant.trend as keyof typeof trendColors]}`} />
-            </td>
-        </tr>
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                onClick={onClose}
+            >
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="w-full max-w-2xl bg-[var(--surface-primary)] border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className="p-6 border-b border-white/5">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: data.color }} />
+                                <h2 className="text-lg font-semibold text-[var(--text-primary)]">{data.category} Deep Dive</h2>
+                            </div>
+                            <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                <X className="w-5 h-5 text-[var(--text-tertiary)]" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="p-6 space-y-6">
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="p-4 rounded-xl bg-white/5">
+                                <div className="text-xs text-[var(--text-tertiary)] mb-1">Total Spend</div>
+                                <div className="text-xl font-bold text-[var(--text-primary)]">{formatCurrency(data.value)}</div>
+                            </div>
+                            <div className="p-4 rounded-xl bg-white/5">
+                                <div className="text-xs text-[var(--text-tertiary)] mb-1">% of Total</div>
+                                <div className="text-xl font-bold text-[var(--text-primary)]">{data.percent}%</div>
+                            </div>
+                            <div className="p-4 rounded-xl bg-white/5">
+                                <div className="text-xs text-[var(--text-tertiary)] mb-1">YoY Change</div>
+                                <div className={`text-xl font-bold ${data.trend > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                    {data.trend > 0 ? '+' : ''}{data.trend}%
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-4 rounded-xl bg-gradient-to-r from-[var(--accent-primary)]/10 to-transparent border border-[var(--accent-primary)]/20">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Brain className="w-4 h-4 text-[var(--accent-primary)]" />
+                                <span className="text-sm font-medium text-[var(--text-primary)]">AI Analysis</span>
+                            </div>
+                            <p className="text-sm text-[var(--text-secondary)]">
+                                {data.category} costs are trending {data.trend > 0 ? 'above' : 'below'} industry benchmarks.
+                                Top drivers include high-cost procedures and specialty care coordination gaps.
+                                Recommend reviewing provider network efficiency.
+                            </p>
+                        </div>
+                    </div>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
     );
 }
 
@@ -392,429 +559,332 @@ function HighCostClaimantRow({ claimant }: { claimant: typeof highCostClaimants[
 // MAIN PAGE COMPONENT
 // ============================================================================
 
-export default function AnalyticsCommandCenterPage() {
-    const [selectedTab, setSelectedTab] = useState<'overview' | 'claims' | 'costs' | 'predictive'>('overview');
-    const [dateRange, setDateRange] = useState('2024');
-    const [nlQuery, setNlQuery] = useState('');
+export default function AnalyticsCommandCenter() {
+    const [selectedCategory, setSelectedCategory] = useState<typeof costBreakdown[0] | null>(null);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        setTimeout(() => setIsRefreshing(false), 2000);
+    };
 
     return (
         <div className="space-y-8">
-            {/* Page Header */}
-            <div className="flex items-center justify-between">
+            {/* Premium Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between"
+            >
                 <div>
-                    <h1 className="text-2xl font-semibold text-[var(--text-primary)] tracking-tight flex items-center gap-3">
-                        <Brain className="w-7 h-7 text-[var(--accent-primary)]" />
-                        Analytics Command Center
-                    </h1>
-                    <p className="text-[var(--text-secondary)] mt-1">
-                        AI-powered intelligence for self-insured plan management
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="relative">
+                            <Brain className="w-8 h-8 text-[var(--accent-primary)]" />
+                            <motion.div
+                                className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full"
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                            />
+                        </div>
+                        <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+                            Analytics Command Center
+                        </h1>
+                    </div>
+                    <p className="text-[var(--text-secondary)] flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
+                        AI-powered insights • Real-time analysis • Predictive intelligence
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)] text-[var(--text-primary)] text-sm hover:bg-[var(--surface-secondary)] transition-colors">
-                        <Calendar className="w-4 h-4 text-[var(--text-secondary)]" />
-                        <span>{dateRange}</span>
-                        <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)] text-[var(--text-secondary)] text-sm hover:text-[var(--text-primary)] transition-colors">
-                        <RefreshCw className="w-4 h-4" />
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleRefresh}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-[var(--text-secondary)] text-sm hover:bg-white/10 transition-colors"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                         Refresh
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[var(--accent-primary)] text-black text-sm font-medium hover:opacity-90 transition-opacity">
-                        <Download className="w-4 h-4" />
-                        Export Report
-                    </button>
-                </div>
-            </div>
-
-            {/* Natural Language Query Bar */}
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="relative"
-            >
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]">
-                    <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
-                    <input
-                        type="text"
-                        value={nlQuery}
-                        onChange={(e) => setNlQuery(e.target.value)}
-                        placeholder="Ask anything... 'Show me claims over $50k this quarter' or 'Which members are at risk of stop-loss breach?'"
-                        className="flex-1 bg-transparent text-[var(--text-primary)] placeholder-[var(--text-tertiary)] outline-none text-sm"
-                    />
-                    <button className="px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-black text-sm font-medium hover:opacity-90 transition-opacity">
-                        Analyze
-                    </button>
+                    </motion.button>
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[var(--accent-primary)] to-amber-400 text-black text-sm font-medium shadow-lg shadow-amber-500/25"
+                    >
+                        <Zap className="w-4 h-4" />
+                        AI Deep Dive
+                    </motion.button>
                 </div>
             </motion.div>
 
-            {/* Tab Navigation */}
-            <div className="flex gap-1 p-1 rounded-lg bg-[var(--surface-primary)] border border-[var(--border-primary)] w-fit">
-                {[
-                    { id: 'overview', label: 'Executive Overview', icon: BarChart3 },
-                    { id: 'claims', label: 'Claims Intelligence', icon: FileText },
-                    { id: 'costs', label: 'Cost Analytics', icon: PieChartIcon },
-                    { id: 'predictive', label: 'Predictive AI', icon: Brain }
-                ].map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setSelectedTab(tab.id as typeof selectedTab)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${selectedTab === tab.id
-                            ? 'bg-[var(--surface-secondary)] text-[var(--text-primary)]'
-                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                            }`}
-                    >
-                        <tab.icon className="w-4 h-4" />
-                        {tab.label}
-                    </button>
+            {/* Executive KPIs */}
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+                {executiveKPIs.map((kpi, index) => (
+                    <ExecutiveKPICard key={kpi.id} kpi={kpi} index={index} />
                 ))}
+            </motion.div>
+
+            {/* Main Content Grid */}
+            <div className="grid lg:grid-cols-3 gap-6">
+                {/* PMPM Trend Chart */}
+                <GlassCard className="lg:col-span-2 p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-lg font-semibold text-[var(--text-primary)]">PMPM Trend & Forecast</h2>
+                            <p className="text-sm text-[var(--text-tertiary)]">Actual vs Budget with AI Projections</p>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs">
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-3 h-0.5 rounded bg-[var(--accent-primary)]" />
+                                Actual
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-3 h-0.5 rounded bg-white/30" style={{ borderStyle: 'dashed' }} />
+                                Budget
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="w-3 h-0.5 rounded bg-cyan-400" />
+                                Projected
+                            </span>
+                        </div>
+                    </div>
+                    <div className="h-72">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={pmpmTrendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="projectedGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#06B6D4" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis dataKey="month" stroke="var(--text-tertiary)" fontSize={11} tickLine={false} axisLine={false} />
+                                <YAxis stroke="var(--text-tertiary)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v}`} domain={[480, 600]} />
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: 'rgba(0,0,0,0.9)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '12px',
+                                        fontSize: '12px',
+                                        backdropFilter: 'blur(10px)'
+                                    }}
+                                    formatter={(value) => value !== undefined ? [`$${value}`, ''] : ['', '']}
+                                />
+                                {/* Confidence band */}
+                                <Area type="monotone" dataKey="upper" stroke="none" fill="#06B6D4" fillOpacity={0.1} />
+                                <Area type="monotone" dataKey="lower" stroke="none" fill="transparent" />
+                                {/* Budget line */}
+                                <Line type="monotone" dataKey="budget" stroke="rgba(255,255,255,0.3)" strokeWidth={2} strokeDasharray="6 4" dot={false} />
+                                {/* Actual area */}
+                                <Area type="monotone" dataKey="actual" stroke="var(--accent-primary)" strokeWidth={3} fill="url(#actualGradient)" dot={{ fill: 'var(--accent-primary)', strokeWidth: 0, r: 4 }} />
+                                {/* Projected area */}
+                                <Area type="monotone" dataKey="projected" stroke="#06B6D4" strokeWidth={3} strokeDasharray="6 4" fill="url(#projectedGradient)" dot={{ fill: '#06B6D4', strokeWidth: 0, r: 4 }} />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </GlassCard>
+
+                {/* Stop-Loss Gauge */}
+                <GlassCard className="p-6" glow>
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Stop-Loss Status</h2>
+                            <p className="text-sm text-[var(--text-tertiary)]">Aggregate Utilization</p>
+                        </div>
+                        <Shield className="w-5 h-5 text-[var(--accent-primary)]" />
+                    </div>
+                    <div className="flex justify-center mb-6">
+                        <CircularProgress value={78} gradient={['#EF4444', '#F97316']} />
+                    </div>
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                            <span className="text-sm text-[var(--text-secondary)]">Specific (any member)</span>
+                            <div className="flex items-center gap-2">
+                                <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                    <div className="h-full w-[85%] bg-gradient-to-r from-rose-500 to-rose-400 rounded-full" />
+                                </div>
+                                <span className="text-sm font-mono text-rose-400">85%</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                            <span className="text-sm text-[var(--text-secondary)]">Aggregate</span>
+                            <div className="flex items-center gap-2">
+                                <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                                    <div className="h-full w-[42%] bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" />
+                                </div>
+                                <span className="text-sm font-mono text-emerald-400">42%</span>
+                            </div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20">
+                            <div className="flex items-center gap-2 text-rose-400">
+                                <AlertTriangle className="w-4 h-4" />
+                                <span className="text-xs font-medium">3 members at breach risk</span>
+                            </div>
+                        </div>
+                    </div>
+                </GlassCard>
             </div>
 
-            {/* Executive Overview Tab */}
-            {selectedTab === 'overview' && (
-                <div className="space-y-6">
-                    {/* KPI Grid */}
+            {/* Cost Breakdown & AI Insights Row */}
+            <div className="grid lg:grid-cols-2 gap-6">
+                {/* Cost Breakdown */}
+                <GlassCard className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Cost Distribution</h2>
+                            <p className="text-sm text-[var(--text-tertiary)]">Click segments to drill down</p>
+                        </div>
+                        <Layers className="w-5 h-5 text-[var(--accent-primary)]" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        {costBreakdown.map((item, index) => (
+                            <motion.button
+                                key={item.category}
+                                whileHover={{ scale: 1.02, x: 4 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => setSelectedCategory(item)}
+                                className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all text-left group"
+                            >
+                                <div
+                                    className="w-3 h-10 rounded-full"
+                                    style={{ backgroundColor: item.color }}
+                                />
+                                <div className="flex-1">
+                                    <div className="text-sm text-[var(--text-primary)]">{item.category}</div>
+                                    <div className="text-xs text-[var(--text-tertiary)]">{item.percent}% of total</div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-sm font-mono text-[var(--text-primary)]">{formatCurrency(item.value)}</div>
+                                    <div className={`text-xs ${item.trend > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                        {item.trend > 0 ? '+' : ''}{item.trend}%
+                                    </div>
+                                </div>
+                            </motion.button>
+                        ))}
+                    </div>
+                </GlassCard>
+
+                {/* AI Insights */}
+                <GlassCard className="p-6" gradient>
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
+                            <h2 className="text-lg font-semibold text-[var(--text-primary)]">AI Insights</h2>
+                        </div>
+                        <span className="px-2 py-1 rounded-full bg-[var(--accent-primary)]/20 text-[var(--accent-primary)] text-xs font-medium">
+                            4 new
+                        </span>
+                    </div>
                     <motion.div
-                        variants={stagger}
+                        variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                        className="grid grid-cols-4 gap-4"
+                        className="space-y-3"
                     >
-                        <KPICard
-                            icon={DollarSign}
-                            label="Total Plan Spend"
-                            value={executiveKPIs.totalSpend}
-                            change={executiveKPIs.totalSpendChange}
-                            format="currency"
-                        />
-                        <KPICard
-                            icon={Activity}
-                            label="PMPM"
-                            value={executiveKPIs.pmpm}
-                            change={executiveKPIs.pmpmChange}
-                            format="currency"
-                            suffix=""
-                        />
-                        <KPICard
-                            icon={Users}
-                            label="Active Members"
-                            value={executiveKPIs.memberCount}
-                            change={executiveKPIs.memberCountChange}
-                            format="number"
-                        />
-                        <KPICard
-                            icon={Target}
-                            label="Budget Variance"
-                            value={Math.abs(executiveKPIs.budgetVariance)}
-                            format="percent"
-                            suffix=""
-                            description={executiveKPIs.budgetVariance < 0 ? 'Under budget' : 'Over budget'}
-                        />
+                        {aiInsights.map((insight, index) => (
+                            <AIInsightCard key={insight.id} insight={insight} index={index} />
+                        ))}
                     </motion.div>
+                </GlassCard>
+            </div>
 
-                    {/* Main Content Grid */}
-                    <div className="grid lg:grid-cols-3 gap-6">
-                        {/* PMPM Trend Chart - 2 columns */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="lg:col-span-2 p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                        >
-                            <div className="flex items-center justify-between mb-6">
-                                <div>
-                                    <h2 className="text-lg font-medium text-[var(--text-primary)]">PMPM Trend Analysis</h2>
-                                    <p className="text-sm text-[var(--text-secondary)]">24-month rolling with budget comparison</p>
-                                </div>
-                                <div className="flex items-center gap-4 text-xs">
-                                    <span className="flex items-center gap-1.5">
-                                        <span className="w-3 h-3 rounded-sm bg-[#F59E0B]" />
-                                        Medical
-                                    </span>
-                                    <span className="flex items-center gap-1.5">
-                                        <span className="w-3 h-3 rounded-sm bg-[#8B5CF6]" />
-                                        Pharmacy
-                                    </span>
-                                    <span className="flex items-center gap-1.5">
-                                        <span className="w-3 h-3 rounded-sm bg-[#06B6D4]" />
-                                        Dental
-                                    </span>
-                                    <span className="flex items-center gap-1.5 text-[var(--text-secondary)]">
-                                        <span className="w-8 border-t-2 border-dashed border-rose-400" />
-                                        Budget
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="h-80">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <ComposedChart data={pmpmTrendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-primary)" vertical={false} />
-                                        <XAxis
-                                            dataKey="month"
-                                            stroke="var(--text-tertiary)"
-                                            fontSize={11}
-                                            tickLine={false}
-                                            axisLine={false}
-                                        />
-                                        <YAxis
-                                            stroke="var(--text-tertiary)"
-                                            fontSize={11}
-                                            tickLine={false}
-                                            axisLine={false}
-                                            tickFormatter={(v) => `$${v}`}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{
-                                                backgroundColor: 'var(--surface-secondary)',
-                                                border: '1px solid var(--border-primary)',
-                                                borderRadius: '8px',
-                                                fontSize: '12px'
-                                            }}
-                                            formatter={(value) => value !== undefined ? [`$${value}`, ''] : ['', '']}
-                                        />
-                                        <Bar dataKey="medical" stackId="a" fill="#F59E0B" radius={[0, 0, 0, 0]} />
-                                        <Bar dataKey="pharmacy" stackId="a" fill="#8B5CF6" radius={[0, 0, 0, 0]} />
-                                        <Bar dataKey="dental" stackId="a" fill="#06B6D4" radius={[0, 0, 0, 0]} />
-                                        <Bar dataKey="admin" stackId="a" fill="#64748B" radius={[4, 4, 0, 0]} />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="budget"
-                                            stroke="#EF4444"
-                                            strokeWidth={2}
-                                            strokeDasharray="6 4"
-                                            dot={false}
-                                        />
-                                    </ComposedChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </motion.div>
-
-                        {/* AI Insights Panel */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 }}
-                            className="p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                        >
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-medium text-[var(--text-primary)] flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5 text-[var(--accent-primary)]" />
-                                    AI Insights
-                                </h2>
-                                <span className="text-xs text-[var(--text-tertiary)]">Updated 2m ago</span>
-                            </div>
-                            <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-3">
-                                {aiInsights.map((insight, i) => (
-                                    <AIInsightCard key={i} insight={insight} />
-                                ))}
-                            </motion.div>
-                        </motion.div>
+            {/* High-Cost Members Table */}
+            <GlassCard className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 className="text-lg font-semibold text-[var(--text-primary)]">High-Cost Members</h2>
+                        <p className="text-sm text-[var(--text-tertiary)]">AI risk-scored with intervention recommendations</p>
                     </div>
-
-                    {/* Second Row - Stop Loss & High Cost Claimants */}
-                    <div className="grid lg:grid-cols-3 gap-6">
-                        {/* Stop-Loss Tracking */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.4 }}
-                            className="p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                        >
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-medium text-[var(--text-primary)]">Stop-Loss Utilization</h2>
-                                <Shield className="w-5 h-5 text-[var(--text-secondary)]" />
-                            </div>
-                            <div className="space-y-6">
-                                <StopLossGauge type="specific" data={stopLossData.specific} />
-                                <div className="border-t border-[var(--border-primary)]" />
-                                <StopLossGauge type="aggregate" data={stopLossData.aggregate} />
-                            </div>
-                        </motion.div>
-
-                        {/* High-Cost Claimants */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.5 }}
-                            className="lg:col-span-2 p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                        >
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-medium text-[var(--text-primary)]">High-Cost Claimants</h2>
-                                <span className="text-xs text-rose-400 bg-rose-400/10 px-2 py-1 rounded-full">
-                                    {highCostClaimants.length} members approaching attachment
-                                </span>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead>
-                                        <tr className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider">
-                                            <th className="text-left py-2 px-4">Member ID</th>
-                                            <th className="text-left py-2 px-4">Primary Diagnosis</th>
-                                            <th className="text-right py-2 px-4">YTD Claims</th>
-                                            <th className="text-center py-2 px-4">Risk Score</th>
-                                            <th className="text-center py-2 px-4">Trend</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {highCostClaimants.map((claimant) => (
-                                            <HighCostClaimantRow key={claimant.id} claimant={claimant} />
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    {/* Third Row - Cost Breakdown & Top Drivers */}
-                    <div className="grid lg:grid-cols-2 gap-6">
-                        {/* Cost Breakdown Donut */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 }}
-                            className="p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                        >
-                            <h2 className="text-lg font-medium text-[var(--text-primary)] mb-6">Cost Breakdown</h2>
-                            <div className="flex items-center gap-8">
-                                <div className="w-48 h-48">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={costBreakdown}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={55}
-                                                outerRadius={80}
-                                                paddingAngle={2}
-                                                dataKey="value"
-                                            >
-                                                {costBreakdown.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip
-                                                formatter={(value) => value !== undefined ? formatCurrency(Number(value)) : ''}
-                                                contentStyle={{
-                                                    backgroundColor: 'var(--surface-secondary)',
-                                                    border: '1px solid var(--border-primary)',
-                                                    borderRadius: '8px',
-                                                    fontSize: '12px'
-                                                }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                </div>
-                                <div className="flex-1 space-y-3">
-                                    {costBreakdown.map((item) => (
-                                        <div key={item.name} className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                                                <span className="text-sm text-[var(--text-secondary)]">{item.name}</span>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="text-sm font-mono text-[var(--text-primary)]">
-                                                    {formatCurrency(item.value, true)}
-                                                </span>
-                                                <span className="text-xs text-[var(--text-tertiary)] ml-2">
-                                                    {item.percent}%
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        {/* Top Cost Drivers */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.7 }}
-                            className="p-6 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)]"
-                        >
-                            <h2 className="text-lg font-medium text-[var(--text-primary)] mb-6">Top Cost Drivers</h2>
-                            <div className="space-y-4">
-                                {topCostDrivers.map((driver, i) => {
-                                    const maxAmount = topCostDrivers[0].amount;
-                                    const barWidth = (driver.amount / maxAmount) * 100;
-
-                                    return (
-                                        <div key={driver.category} className="space-y-1.5">
-                                            <div className="flex items-center justify-between text-sm">
-                                                <span className="text-[var(--text-secondary)]">{driver.category}</span>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="font-mono text-[var(--text-primary)]">
-                                                        {formatCurrency(driver.amount, true)}
-                                                    </span>
-                                                    <span className={`text-xs ${driver.change >= 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                                        {driver.change >= 0 ? '+' : ''}{driver.change}%
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div className="h-2 bg-[var(--surface-secondary)] rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${barWidth}%` }}
-                                                    transition={{ duration: 0.6, delay: 0.1 * i }}
-                                                    className="h-full rounded-full"
-                                                    style={{
-                                                        backgroundColor: driver.change >= 20 ? '#EF4444' :
-                                                            driver.change >= 0 ? '#F59E0B' : '#10B981'
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </motion.div>
+                    <div className="flex items-center gap-2">
+                        <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 text-[var(--text-secondary)] text-xs hover:bg-white/10 transition-colors">
+                            <Filter className="w-3.5 h-3.5" />
+                            Filter
+                        </button>
+                        <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 text-[var(--text-secondary)] text-xs hover:bg-white/10 transition-colors">
+                            <Download className="w-3.5 h-3.5" />
+                            Export
+                        </button>
                     </div>
                 </div>
-            )}
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="text-xs text-[var(--text-tertiary)] uppercase tracking-wider">
+                                <th className="text-left py-3 px-4">Member ID</th>
+                                <th className="text-center py-3 px-4">Risk Score</th>
+                                <th className="text-left py-3 px-4">Primary Condition</th>
+                                <th className="text-right py-3 px-4">YTD Claims</th>
+                                <th className="text-right py-3 px-4">Projected</th>
+                                <th className="text-center py-3 px-4">Trend</th>
+                                <th className="text-left py-3 px-4">Intervention</th>
+                                <th className="text-center py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {highCostMembers.map((member, index) => (
+                                <motion.tr
+                                    key={member.id}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.05 }}
+                                    className="border-t border-white/5 hover:bg-white/[0.02] transition-colors"
+                                >
+                                    <td className="py-4 px-4">
+                                        <span className="text-sm font-mono text-[var(--text-primary)]">{member.id}</span>
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        <div className="inline-flex items-center gap-2">
+                                            <div className={`w-2 h-2 rounded-full ${member.riskScore >= 90 ? 'bg-rose-500 animate-pulse' :
+                                                member.riskScore >= 80 ? 'bg-amber-500' : 'bg-emerald-500'
+                                                }`} />
+                                            <span className={`text-sm font-bold ${member.riskScore >= 90 ? 'text-rose-400' :
+                                                member.riskScore >= 80 ? 'text-amber-400' : 'text-emerald-400'
+                                                }`}>
+                                                {member.riskScore}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <span className="text-sm text-[var(--text-secondary)]">{member.condition}</span>
+                                    </td>
+                                    <td className="py-4 px-4 text-right">
+                                        <span className="text-sm font-mono text-[var(--text-primary)]">{formatCurrency(member.ytdClaims)}</span>
+                                    </td>
+                                    <td className="py-4 px-4 text-right">
+                                        <span className="text-sm font-mono text-[var(--accent-primary)]">{formatCurrency(member.projected)}</span>
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        {member.trend === 'up' && <TrendingUp className="w-4 h-4 text-rose-400 mx-auto" />}
+                                        {member.trend === 'down' && <TrendingDown className="w-4 h-4 text-emerald-400 mx-auto" />}
+                                        {member.trend === 'stable' && <Activity className="w-4 h-4 text-amber-400 mx-auto" />}
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs">
+                                            <Target className="w-3 h-3" />
+                                            {member.intervention}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        <button className="p-2 rounded-lg hover:bg-white/10 transition-colors group">
+                                            <Eye className="w-4 h-4 text-[var(--text-tertiary)] group-hover:text-[var(--accent-primary)]" />
+                                        </button>
+                                    </td>
+                                </motion.tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </GlassCard>
 
-            {/* Claims Intelligence Tab */}
-            {selectedTab === 'claims' && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-8 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)] text-center"
-                >
-                    <FileText className="w-12 h-12 text-[var(--text-tertiary)] mx-auto mb-4" />
-                    <h2 className="text-lg font-medium text-[var(--text-primary)] mb-2">Claims Intelligence Module</h2>
-                    <p className="text-[var(--text-secondary)] max-w-md mx-auto">
-                        Advanced claims analysis with drill-down capabilities, anomaly detection, and Sankey flow visualization.
-                    </p>
-                </motion.div>
-            )}
-
-            {/* Cost Analytics Tab */}
-            {selectedTab === 'costs' && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-8 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)] text-center"
-                >
-                    <PieChartIcon className="w-12 h-12 text-[var(--text-tertiary)] mx-auto mb-4" />
-                    <h2 className="text-lg font-medium text-[var(--text-primary)] mb-2">Cost Analytics Module</h2>
-                    <p className="text-[var(--text-secondary)] max-w-md mx-auto">
-                        TreeMaps, waterfall charts, and year-over-year variance analysis.
-                    </p>
-                </motion.div>
-            )}
-
-            {/* Predictive AI Tab */}
-            {selectedTab === 'predictive' && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-8 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-primary)] text-center"
-                >
-                    <Brain className="w-12 h-12 text-[var(--text-tertiary)] mx-auto mb-4" />
-                    <h2 className="text-lg font-medium text-[var(--text-primary)] mb-2">Predictive Intelligence Module</h2>
-                    <p className="text-[var(--text-secondary)] max-w-md mx-auto">
-                        ML-driven risk scoring, stop-loss forecasting, and renewal projections.
-                    </p>
-                </motion.div>
+            {/* Drill-down Modal */}
+            {selectedCategory && (
+                <DrillDownModal data={selectedCategory} onClose={() => setSelectedCategory(null)} />
             )}
         </div>
     );
