@@ -1,2 +1,2 @@
-// Settings Components
-export { SettingsPanel } from './SettingsPanel';
+// Settings
+export { SettingsSection, ToggleSetting, SelectSetting, OrganizationSettings, ThresholdManager } from './SettingsComponents';
