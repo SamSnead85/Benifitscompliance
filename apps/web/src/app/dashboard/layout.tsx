@@ -19,10 +19,19 @@ import {
     Command,
     LogOut,
     User,
-    DollarSign
+    DollarSign,
+    BarChart3,
+    Pill,
+    Briefcase,
+    FileText,
+    Shield,
+    FolderOpen,
+    Sparkles,
+    Scale
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ThemeToggle } from '@/components/ThemeToggle';
+
 
 // Navigation structure
 const navigation = [
@@ -34,13 +43,34 @@ const navigation = [
         ]
     },
     {
+        group: 'Analytics',
+        items: [
+            { name: 'Command Center', href: '/analytics', icon: BarChart3 },
+            { name: 'Ask AI', href: '/analytics/ask', icon: Sparkles },
+            { name: 'Claims Intel', href: '/analytics/claims', icon: FileText },
+            { name: 'Predictive AI', href: '/analytics/predictive', icon: Brain },
+            { name: 'Pharmacy Intel', href: '/analytics/pharmacy', icon: Pill },
+            { name: 'CFO Dashboard', href: '/analytics/financial', icon: Briefcase },
+            { name: 'Benchmarks', href: '/analytics/benchmarks', icon: Scale },
+            { name: 'Report Studio', href: '/analytics/reports', icon: FileText },
+            { name: 'Self-Insured', href: '/self-insured', icon: DollarSign },
+        ]
+    },
+    {
         group: 'Intelligence',
         items: [
             { name: 'Data Refinery', href: '/refinery', icon: Workflow },
             { name: 'Compliance', href: '/compliance', icon: FileCheck },
-            { name: 'Self-Insured', href: '/self-insured', icon: DollarSign },
+            { name: 'Documents', href: '/documents', icon: FolderOpen },
+            { name: 'Regulatory', href: '/regulatory', icon: Shield },
+            { name: 'Members', href: '/members', icon: Users },
+        ]
+    },
+    {
+        group: 'Automation',
+        items: [
             { name: 'Workflow Builder', href: '/workflow-builder', icon: Workflow },
-            { name: 'Reports', href: '/reports', icon: FileCheck },
+            { name: 'Reports', href: '/reports', icon: FileText },
         ]
     },
     {
