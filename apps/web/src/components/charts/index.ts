@@ -1,2 +1,2 @@
-// Chart Components
-export { FTETrendChart, CoverageBreakdownChart, ComplianceHeatmap } from './DataCharts';
+// Charts
+export { ComplianceTimelineChart, EligibilityFlowDiagram } from './ComplianceTimelineChart';

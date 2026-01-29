@@ -1,2 +1,2 @@
-// Table Components
-export { DataTable } from './DataTable';
+// Tables
+export { ProfessionalDataGrid } from './ProfessionalDataGrid';

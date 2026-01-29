@@ -1,2 +1,13 @@
-// State Components
-export { EmptyState, LoadingState, FeaturePlaceholder } from './StateComponents';
+// States
+export {
+    Skeleton,
+    CardSkeleton,
+    TableSkeleton,
+    EmptyState,
+    NoResultsState,
+    NoEmployeesState,
+    NoDocumentsState,
+    ErrorState,
+    SuccessState,
+    ProgressIndicator
+} from './LoadingStates';

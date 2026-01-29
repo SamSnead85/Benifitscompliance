@@ -1,3 +1,7 @@
-// Modal Components
-export { ConfirmDialog, AlertBanner } from './ConfirmDialog';
-export { FormPreviewModal } from './FormPreviewModal';
+// Modals
+export {
+    ProfessionalModal,
+    ConfirmationDialog,
+    WizardModal,
+    SidePanel
+} from './ProfessionalModals';
