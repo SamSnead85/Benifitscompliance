@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -32,16 +33,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
       <body className="antialiased">
-        {/* Atmospheric Background System */}
-        <div className="atmosphere" aria-hidden="true" />
-        <div className="noise-overlay" aria-hidden="true" />
+        <ThemeProvider>
+          {/* Atmospheric Background System */}
+          <div className="atmosphere" aria-hidden="true" />
+          <div className="noise-overlay" aria-hidden="true" />
 
-        {/* Main Content */}
-        <main className="relative z-10">
-          {children}
-        </main>
+          {/* Main Content */}
+          <main className="relative z-10">
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );

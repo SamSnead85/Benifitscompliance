@@ -1,350 +1,366 @@
-@import "tailwindcss";
+/* Google Fonts - Premium Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* ============================================
-   SYNAPSE DESIGN SYSTEM
-   "Clinical Precision" - Healthcare Light Theme
-   ============================================ */
+@import 'tailwindcss';
 
-@theme inline {
-  /* ===========================================
-     CLINICAL PRECISION PALETTE
-     Healthcare-grade light foundations
-     =========================================== */
+:root {
+  /* ===== DARK THEME (DEFAULT) - Cinematic Premium ===== */
 
-  /* Primary Backgrounds - Clean Clinical Surfaces */
-  --color-surface-base: #F8FAFC;
-  --color-surface-elevated: #FFFFFF;
-  --color-surface-subtle: #F1F5F9;
-  --color-surface-inset: #E2E8F0;
+  /* Deep Noir Backgrounds */
+  --bg-base: #050508;
+  --bg-surface: #0A0A0F;
+  --bg-elevated: #111118;
+  --bg-muted: #1A1A24;
+  --bg-subtle: #252532;
 
-  /* Navigation Sidebar - Remains Dark for Contrast */
-  --color-sidebar: #0F172A;
-  --color-sidebar-elevated: #1E293B;
+  /* Premium Accent Gradient */
+  --accent-primary: #06B6D4;
+  --accent-secondary: #22D3EE;
+  --accent-tertiary: #10B981;
+  --accent-gradient: linear-gradient(135deg, #06B6D4 0%, #22D3EE 50%, #10B981 100%);
 
-  /* Brand Accent - Healthcare Navy & Teal */
-  --color-primary: #0D9488;
-  --color-primary-dark: #0F766E;
-  --color-primary-light: #14B8A6;
-  --color-primary-muted: rgba(13, 148, 136, 0.12);
-  --color-primary-glow: rgba(13, 148, 136, 0.25);
+  /* Text Hierarchy - Refined */
+  --text-primary: #FFFFFF;
+  --text-secondary: #E2E8F0;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+  --text-faint: #475569;
 
-  /* Secondary - Institutional Navy */
-  --color-navy: #1E3A5F;
-  --color-navy-light: #2D4A6F;
-  --color-navy-muted: rgba(30, 58, 95, 0.1);
+  /* Semantic Colors */
+  --color-success: #10B981;
+  --color-success-muted: rgba(16, 185, 129, 0.15);
+  --color-warning: #F59E0B;
+  --color-warning-muted: rgba(245, 158, 11, 0.15);
+  --color-danger: #EF4444;
+  --color-danger-muted: rgba(239, 68, 68, 0.15);
+  --color-info: #3B82F6;
+  --color-info-muted: rgba(59, 130, 246, 0.15);
 
-  /* Semantic Colors - Healthcare Status */
-  --color-success: #059669;
-  --color-success-bg: rgba(5, 150, 105, 0.08);
-  --color-success-border: rgba(5, 150, 105, 0.25);
+  /* Card & Surface Treatments */
+  --card-bg: rgba(17, 17, 24, 0.95);
+  --card-bg-hover: rgba(26, 26, 36, 0.95);
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-border-hover: rgba(255, 255, 255, 0.12);
+  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --card-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
 
-  --color-warning: #D97706;
-  --color-warning-bg: rgba(217, 119, 6, 0.08);
-  --color-warning-border: rgba(217, 119, 6, 0.25);
+  /* Netflix-Style Card Glow */
+  --card-glow: 0 0 40px rgba(6, 182, 212, 0.08);
+  --card-glow-hover: 0 0 60px rgba(6, 182, 212, 0.15);
 
-  --color-critical: #DC2626;
-  --color-critical-bg: rgba(220, 38, 38, 0.08);
-  --color-critical-border: rgba(220, 38, 38, 0.25);
+  /* Glass Effects */
+  --glass-bg: rgba(10, 10, 15, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(24px);
 
-  --color-info: #0284C7;
-  --color-info-bg: rgba(2, 132, 199, 0.08);
-  --color-info-border: rgba(2, 132, 199, 0.25);
+  /* Component Surfaces */
+  --sidebar-bg: linear-gradient(180deg, #0A0A0F 0%, #050508 100%);
+  --sidebar-border: rgba(255, 255, 255, 0.04);
+  --header-bg: rgba(5, 5, 8, 0.9);
+  --input-bg: rgba(255, 255, 255, 0.04);
+  --input-border: rgba(255, 255, 255, 0.08);
+  --input-focus: rgba(6, 182, 212, 0.25);
 
-  /* Text Hierarchy - Clinical Readability */
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #334155;
-  --color-text-muted: #64748B;
-  --color-text-subtle: #94A3B8;
-  --color-text-inverse: #FFFFFF;
+  /* Interactive States */
+  --hover-overlay: rgba(255, 255, 255, 0.04);
+  --active-overlay: rgba(255, 255, 255, 0.08);
+  --focus-ring: 0 0 0 2px rgba(6, 182, 212, 0.4);
 
-  /* Borders & Dividers */
-  --color-border: #E2E8F0;
-  --color-border-strong: #CBD5E1;
-  --color-border-subtle: #F1F5F9;
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* Card Surfaces */
-  --card-bg: #FFFFFF;
-  --card-bg-hover: #F8FAFC;
-  --card-border: #E2E8F0;
-  --card-border-hover: #CBD5E1;
-  --card-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 4px 12px rgba(0, 0, 0, 0.03);
-  --card-shadow-hover:
-    0 4px 12px rgba(0, 0, 0, 0.06),
-    0 12px 32px rgba(0, 0, 0, 0.04);
-
-  /* ===========================================
-     PRECISION GEOMETRY
-     Sharp edges for institutional authority
-     =========================================== */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-
-  /* ===========================================
-     SHADOW STACKS - Light Mode Optimized
-     Subtle depth for premium lift
-     =========================================== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.1);
-
-  --shadow-lift:
-    0 2px 4px rgba(0, 0, 0, 0.04),
-    0 8px 24px rgba(0, 0, 0, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.8) inset;
-
-  /* Focus Ring */
-  --focus-ring: 0 0 0 3px rgba(13, 148, 136, 0.25);
-
-  /* ===========================================
-     TYPOGRAPHY SCALE
-     Institutional precision with Inter
-     =========================================== */
-  --font-display: 'Inter', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
-
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 2rem;
-  --text-4xl: 2.5rem;
-  --text-5xl: 3rem;
-
-  /* ===========================================
-     MOTION & TRANSITIONS
-     =========================================== */
-  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-
-  --transition-fast: 150ms var(--ease-smooth);
-  --transition-smooth: 300ms var(--ease-smooth);
-  --transition-slow: 500ms var(--ease-smooth);
-
-  /* ===========================================
-     SPACING SYSTEM
-     =========================================== */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
-  --space-4xl: 96px;
+  /* Spacing Scale */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
-/* ===========================================
-   BASE LAYER
-   =========================================== */
+/* ===== ENHANCED LIGHT THEME - Clinical Precision ===== */
+[data-theme="light"] {
+  /* Warm Premium Backgrounds - NOT plain white */
+  --bg-base: linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%);
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-muted: #F8FAFC;
+  --bg-subtle: #F1F5F9;
+
+  /* Healthcare Navy + Teal Accents */
+  --accent-primary: #0D9488;
+  --accent-secondary: #0891B2;
+  --accent-tertiary: #059669;
+  --accent-gradient: linear-gradient(135deg, #1E3A5F 0%, #0D9488 50%, #059669 100%);
+
+  /* Text Hierarchy - High Contrast */
+  --text-primary: #0F172A;
+  --text-secondary: #1E293B;
+  --text-muted: #475569;
+  --text-dim: #64748B;
+  --text-faint: #94A3B8;
+
+  /* Semantic Colors - Deeper for light bg */
+  --color-success: #059669;
+  --color-success-muted: rgba(5, 150, 105, 0.12);
+  --color-warning: #D97706;
+  --color-warning-muted: rgba(217, 119, 6, 0.12);
+  --color-danger: #DC2626;
+  --color-danger-muted: rgba(220, 38, 38, 0.12);
+  --color-info: #0284C7;
+  --color-info-muted: rgba(2, 132, 199, 0.12);
+
+  /* Premium Card Treatments */
+  --card-bg: #FFFFFF;
+  --card-bg-hover: #FFFFFF;
+  --card-border: rgba(15, 23, 42, 0.08);
+  --card-border-hover: rgba(13, 148, 136, 0.25);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 20px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(13, 148, 136, 0.15);
+
+  /* Subtle Glow for Light Mode */
+  --card-glow: 0 0 30px rgba(13, 148, 136, 0.05);
+  --card-glow-hover: 0 0 40px rgba(13, 148, 136, 0.1);
+
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --glass-blur: blur(24px);
+
+  /* Sidebar - STAYS DARK for contrast */
+  --sidebar-bg: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --input-bg: #F8FAFC;
+  --input-border: rgba(15, 23, 42, 0.12);
+  --input-focus: rgba(13, 148, 136, 0.25);
+
+  /* Interactive States */
+  --hover-overlay: rgba(15, 23, 42, 0.04);
+  --active-overlay: rgba(15, 23, 42, 0.08);
+  --focus-ring: 0 0 0 2px rgba(13, 148, 136, 0.4);
+}
+
+/* ==========================================================================
+   BASE STYLES
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html {
-  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 body {
-  background-color: var(--color-surface-base);
-  color: var(--color-text-primary);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  transition: background 0.4s ease, color 0.3s ease;
 }
 
-/* ===========================================
-   ATMOSPHERIC BACKGROUND SYSTEM
-   Light Mode Subtle Environment
-   =========================================== */
+/* Premium heading typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
 
-.atmosphere {
+/* ==========================================================================
+   SIDEBAR - Premium Navigation
+   ========================================================================== */
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--sidebar-border);
   position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(13, 148, 136, 0.04), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(30, 58, 95, 0.03), transparent 40%),
-    linear-gradient(180deg, var(--color-surface-base) 0%, var(--color-surface-subtle) 100%);
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
 }
 
-/* Subtle Grid Pattern */
-.atmosphere::after {
+.sidebar-brand {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.25rem 0.75rem;
+  overflow-y: auto;
+}
+
+.sidebar-group-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #64748B;
+  padding: 0 0.75rem;
+  margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #94A3B8;
+  transition: all 0.2s ease;
+  margin-bottom: 0.25rem;
+  position: relative;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #FFFFFF;
+}
+
+.sidebar-link--active {
+  background: rgba(6, 182, 212, 0.12);
+  color: #22D3EE;
+}
+
+[data-theme="light"] .sidebar-link--active {
+  background: rgba(13, 148, 136, 0.15);
+  color: #14B8A6;
+}
+
+.sidebar-link--active::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(30, 58, 95, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 58, 95, 0.02) 1px, transparent 1px);
-  background-size: 60px 60px;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--accent-gradient);
+  border-radius: 0 2px 2px 0;
 }
 
-/* ===========================================
-   CARD SYSTEM
-   Premium light surfaces
-   =========================================== */
+/* ==========================================================================
+   NETFLIX-STYLE CARDS
+   ========================================================================== */
 
 .glass-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow);
-  transition: all var(--transition-smooth);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
 }
 
 .glass-card:hover {
-  background: var(--card-bg);
   border-color: var(--card-border-hover);
+  box-shadow: var(--card-shadow-hover), var(--card-glow-hover);
   transform: translateY(-2px);
-  box-shadow: var(--card-shadow-hover);
 }
 
-.glass {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  box-shadow: var(--card-shadow);
+.glass-card:hover::before {
+  opacity: 0.02;
 }
 
-.glass-strong {
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--card-border-hover);
-  box-shadow: var(--shadow-md);
-}
-
-/* ===========================================
-   BUTTON SYSTEM
-   Healthcare-grade professional buttons
-   =========================================== */
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: var(--color-text-inverse);
-  font-weight: 600;
-  font-size: 14px;
-  border-radius: var(--radius-md);
-  border: none;
-  cursor: pointer;
-  transition: all var(--transition-smooth);
-  box-shadow:
-    0 2px 4px rgba(13, 148, 136, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    0 4px 12px rgba(13, 148, 136, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--color-surface-elevated);
-  color: var(--color-text-primary);
-  font-weight: 500;
-  font-size: 14px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--card-border);
-  cursor: pointer;
-  transition: all var(--transition-smooth);
-}
-
-.btn-secondary:hover {
-  background: var(--color-surface-subtle);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-/* ===========================================
-   METRIC CARDS
-   Clinical data presentation
-   =========================================== */
-
+/* Metric Cards - Premium Stats */
 .metric-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  transition: all var(--transition-smooth);
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--card-shadow);
 }
 
-.metric-card::before {
+.metric-card::after {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
-  opacity: 0;
-  transition: opacity var(--transition-smooth);
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, var(--accent-primary) 0%, transparent 70%);
+  opacity: 0.05;
+  pointer-events: none;
 }
 
 .metric-card:hover {
   border-color: var(--card-border-hover);
-  transform: translateY(-2px);
   box-shadow: var(--card-shadow-hover);
-}
-
-.metric-card:hover::before {
-  opacity: 1;
+  transform: translateY(-3px) scale(1.01);
 }
 
 .metric-value {
-  font-family: var(--font-mono);
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  letter-spacing: -0.03em;
   line-height: 1;
 }
 
 .metric-label {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin-top: var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  letter-spacing: 0;
 }
 
 .metric-trend {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
   font-size: 0.75rem;
   font-weight: 600;
-  margin-top: var(--space-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
 }
 
 .metric-trend--up {
   color: var(--color-success);
+  background: var(--color-success-muted);
 }
 
 .metric-trend--down {
-  color: var(--color-critical);
+  color: var(--color-danger);
+  background: var(--color-danger-muted);
 }
 
-/* ===========================================
-   DATA TABLES
-   High-density institutional tables
-   =========================================== */
+/* ==========================================================================
+   DATA TABLES - Premium Grid
+   ========================================================================== */
 
 .data-table {
   width: 100%;
@@ -353,292 +369,301 @@ body {
 }
 
 .data-table th {
-  padding: var(--space-md);
   text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 1rem 1.25rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
-  background: var(--color-surface-subtle);
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
   border-bottom: 1px solid var(--card-border);
+  background: var(--bg-muted);
+}
+
+.data-table th:first-child {
+  border-radius: var(--radius-md) 0 0 0;
+}
+
+.data-table th:last-child {
+  border-radius: 0 var(--radius-md) 0 0;
 }
 
 .data-table td {
-  padding: var(--space-md);
+  padding: 1rem 1.25rem;
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  border-bottom: 1px solid var(--color-border-subtle);
+  font-weight: 450;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--card-border);
+  transition: background 0.15s ease;
 }
 
-.data-table tbody tr {
-  transition: background var(--transition-fast);
+.data-table tr:hover td {
+  background: var(--hover-overlay);
 }
 
-.data-table tbody tr:hover {
-  background: var(--color-surface-subtle);
+.data-table tr:last-child td {
+  border-bottom: none;
 }
 
-/* ===========================================
-   STATUS BADGES
-   Healthcare status indicators
-   =========================================== */
+.data-table tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--radius-md);
+}
+
+.data-table tr:last-child td:last-child {
+  border-radius: 0 0 var(--radius-md) 0;
+}
+
+/* ==========================================================================
+   BADGES - Premium Status Indicators
+   ========================================================================== */
 
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  border-radius: var(--radius-sm);
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .badge--success {
-  background: var(--color-success-bg);
+  background: var(--color-success-muted);
   color: var(--color-success);
-  border: 1px solid var(--color-success-border);
 }
 
 .badge--warning {
-  background: var(--color-warning-bg);
+  background: var(--color-warning-muted);
   color: var(--color-warning);
-  border: 1px solid var(--color-warning-border);
 }
 
 .badge--critical {
-  background: var(--color-critical-bg);
-  color: var(--color-critical);
-  border: 1px solid var(--color-critical-border);
+  background: var(--color-danger-muted);
+  color: var(--color-danger);
 }
 
 .badge--info {
-  background: var(--color-info-bg);
+  background: var(--color-info-muted);
   color: var(--color-info);
-  border: 1px solid var(--color-info-border);
 }
 
-/* ===========================================
-   SIDEBAR NAVIGATION
-   Remains dark for professional contrast
-   =========================================== */
+/* ==========================================================================
+   BUTTONS - Cinematic CTAs
+   ========================================================================== */
 
-.sidebar {
-  width: 260px;
-  height: 100vh;
-  background: var(--color-sidebar);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  left: 0;
-  top: 0;
-}
-
-.sidebar-brand {
-  padding: var(--space-xl);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: var(--space-lg);
-  overflow-y: auto;
-}
-
-.sidebar-group-title {
-  font-size: 0.625rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: var(--space-sm);
-  padding: 0 var(--space-sm);
-}
-
-.sidebar-link {
-  display: flex;
+.btn-primary {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 10px 12px;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  color: #050508;
+  background: var(--accent-gradient);
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-  margin-bottom: 2px;
-}
-
-.sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.95);
-}
-
-.sidebar-link--active {
-  background: var(--color-primary-muted);
-  color: var(--color-primary-light);
-}
-
-/* ===========================================
-   PIPELINE VISUALIZATION
-   Clinical workflow display
-   =========================================== */
-
-.pipeline-node {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  position: relative;
-  transition: all var(--transition-smooth);
-  box-shadow: var(--card-shadow);
-}
-
-.pipeline-node--active {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-muted);
-}
-
-.pipeline-connector {
-  height: 2px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 12px rgba(6, 182, 212, 0.35);
   position: relative;
   overflow: hidden;
 }
 
-.pipeline-connector::after {
+[data-theme="light"] .btn-primary {
+  color: #FFFFFF;
+  box-shadow: 0 2px 12px rgba(13, 148, 136, 0.3);
+}
+
+.btn-primary::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
-  animation: data-flow 2s linear infinite;
-}
-
-@keyframes data-flow {
-  0% {
-    left: -50%;
-  }
-
-  100% {
-    left: 150%;
-  }
-}
-
-/* ===========================================
-   RADIAL GAUGE
-   =========================================== */
-
-.radial-gauge {
-  position: relative;
-  width: 180px;
-  height: 180px;
-}
-
-.radial-gauge svg {
-  transform: rotate(-90deg);
-}
-
-.radial-gauge-bg {
-  fill: none;
-  stroke: var(--color-border);
-  stroke-width: 8;
-}
-
-.radial-gauge-value {
-  fill: none;
-  stroke: var(--color-primary);
-  stroke-width: 8;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 1s var(--ease-smooth);
-}
-
-.radial-gauge-label {
-  position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.45);
+}
+
+.btn-primary:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-secondary {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* ===========================================
-   COMMAND PALETTE
-   =========================================== */
+.btn-secondary:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--hover-overlay);
+}
+
+/* ==========================================================================
+   FORM INPUTS - Premium Fields
+   ========================================================================== */
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 450;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.input::placeholder {
+  color: var(--text-dim);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: var(--focus-ring);
+}
+
+/* ==========================================================================
+   HEADER - Glass Navigation
+   ========================================================================== */
+
+.glass-strong {
+  background: var(--header-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+/* ==========================================================================
+   COMMAND PALETTE - Premium Search
+   ========================================================================== */
 
 .command-palette-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
   z-index: 9999;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 20vh;
+  padding-top: 18vh;
 }
 
 .command-palette {
   width: 100%;
-  max-width: 560px;
-  background: var(--color-surface-elevated);
+  max-width: 580px;
+  background: var(--bg-elevated);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+}
+
+[data-theme="light"] .command-palette {
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15);
 }
 
 .command-palette-input {
   width: 100%;
-  padding: var(--space-lg);
+  padding: 1.25rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 450;
+  color: var(--text-primary);
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--card-border);
-  font-size: 1rem;
-  color: var(--color-text-primary);
 }
 
 .command-palette-input::placeholder {
-  color: var(--color-text-subtle);
+  color: var(--text-dim);
+}
+
+.command-palette-input:focus {
+  outline: none;
 }
 
 .command-palette-results {
   max-height: 400px;
   overflow-y: auto;
-  padding: var(--space-sm);
+  padding: 0.75rem;
 }
 
 .command-palette-group-title {
   font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--color-text-muted);
-  padding: var(--space-sm) var(--space-md);
+  letter-spacing: 0.15em;
+  color: var(--text-dim);
+  padding: 0.75rem 1rem 0.5rem;
 }
 
 .command-palette-item {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 10px var(--space-md);
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  gap: 0.875rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 450;
+  color: var(--text-secondary);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.15s ease;
 }
 
-.command-palette-item:hover,
-.command-palette-item--focused {
-  background: var(--color-primary-muted);
-  color: var(--color-text-primary);
+.command-palette-item:hover {
+  background: var(--hover-overlay);
+  color: var(--text-primary);
 }
 
-/* ===========================================
-   SCROLLBAR STYLING
-   =========================================== */
+/* ==========================================================================
+   THEME TOGGLE
+   ========================================================================== */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--hover-overlay);
+  border: 1px solid var(--card-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--active-overlay);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+  box-shadow: var(--card-glow);
+}
+
+/* ==========================================================================
+   SCROLLBAR - Premium
+   ========================================================================== */
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -646,55 +671,41 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-surface-subtle);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
+  background: var(--text-faint);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-subtle);
+  background: var(--text-dim);
 }
 
-/* ===========================================
-   FOCUS STATES
-   =========================================== */
+/* ==========================================================================
+   FOCUS STATES & ANIMATIONS
+   ========================================================================== */
 
 :focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
 
-/* ===========================================
-   ANIMATION UTILITIES
-   =========================================== */
-
-.animate-fade-in {
-  animation: fadeIn 0.5s var(--ease-smooth);
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
-}
-
-.animate-slide-up {
-  animation: slideUp 0.5s var(--ease-smooth);
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(12px);
   }
 
   to {
@@ -703,135 +714,82 @@ body {
   }
 }
 
-.animate-scale-in {
-  animation: scaleIn 0.3s var(--ease-spring);
-}
+@keyframes pulse {
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
+  0%,
+  100% {
     opacity: 1;
-    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
   }
 }
 
-/* ===========================================
-   FORM ELEMENTS
-   Clinical input styling
-   =========================================== */
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="date"],
-select,
-textarea {
-  background: var(--color-surface-elevated);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-primary);
-  transition: all var(--transition-fast);
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease forwards;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: var(--focus-ring);
-  outline: none;
+.animate-slideUp {
+  animation: slideUp 0.5s ease forwards;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: var(--color-text-subtle);
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
 }
 
-/* Checkbox styling */
-input[type="checkbox"] {
-  accent-color: var(--color-primary);
-}
-
-/* ===========================================
-   ID CARD - Premium Healthcare Card
-   Looks great in light mode
-   =========================================== */
+/* ==========================================================================
+   ID CARD - Premium Healthcare
+   ========================================================================== */
 
 .id-card {
-  background: linear-gradient(145deg, var(--color-navy) 0%, var(--color-navy-light) 100%);
-  border-radius: var(--radius-xl);
-  padding: var(--space-xl);
-  color: white;
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  color: #FFFFFF;
   position: relative;
   overflow: hidden;
-  box-shadow:
-    0 8px 32px rgba(30, 58, 95, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .id-card::before {
   content: '';
   position: absolute;
   top: -50%;
-  right: -20%;
-  width: 60%;
-  height: 150%;
-  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.08), transparent 60%);
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 180deg, transparent, rgba(6, 182, 212, 0.1), transparent 30%);
+  animation: rotate 10s linear infinite;
   pointer-events: none;
 }
 
-.id-card-logo {
-  position: absolute;
-  top: var(--space-lg);
-  right: var(--space-lg);
-  opacity: 0.9;
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .id-card-chip {
-  width: 48px;
-  height: 36px;
-  background: linear-gradient(135deg, #D4AF37, #F4D03F, #D4AF37);
-  border-radius: 6px;
-  margin-bottom: var(--space-lg);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  width: 42px;
+  height: 32px;
+  background: linear-gradient(145deg, #D4AF37 0%, #F4D03F 30%, #D4AF37 50%, #B8860B 100%);
+  border-radius: 5px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.id-card-member {
-  font-size: var(--text-lg);
-  font-weight: 600;
-  margin-bottom: var(--space-xs);
-}
-
-.id-card-id {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  letter-spacing: 0.1em;
-  opacity: 0.85;
-}
-
-.id-card-details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
-  margin-top: var(--space-xl);
-  padding-top: var(--space-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.id-card-field label {
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.7;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.id-card-field span {
-  font-size: var(--text-sm);
-  font-weight: 500;
+.id-card-chip::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: repeating-linear-gradient(90deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.1) 3px,
+      rgba(0, 0, 0, 0.1) 6px);
 }

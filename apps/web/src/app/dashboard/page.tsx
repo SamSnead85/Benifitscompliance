@@ -2,20 +2,68 @@
 
 import { motion } from 'framer-motion';
 import {
-    Users,
-    Building2,
-    AlertTriangle,
-    CheckCircle2,
     TrendingUp,
     TrendingDown,
-    Calendar,
+    Users,
     FileCheck,
-    ArrowRight,
+    AlertTriangle,
     Clock,
-    AlertCircle,
-    ChevronRight
+    Building2,
+    ArrowRight,
+    Activity,
+    Shield,
+    DollarSign,
+    Calendar
 } from 'lucide-react';
 import Link from 'next/link';
+
+const stats = [
+    {
+        label: 'Total Clients',
+        value: '247',
+        change: '+12',
+        trend: 'up',
+        icon: Building2,
+    },
+    {
+        label: 'Active Employees',
+        value: '18,432',
+        change: '+3.2%',
+        trend: 'up',
+        icon: Users,
+    },
+    {
+        label: 'Compliance Score',
+        value: '98.7%',
+        change: '+0.8%',
+        trend: 'up',
+        icon: Shield,
+    },
+    {
+        label: 'Pending Actions',
+        value: '23',
+        change: '-5',
+        trend: 'down',
+        icon: Clock,
+    },
+];
+
+const upcomingDeadlines = [
+    { name: 'Q4 1095-C Filing', date: 'Mar 31, 2026', status: 'on-track', daysLeft: 61 },
+    { name: 'Annual 1094-C Summary', date: 'Feb 28, 2026', status: 'attention', daysLeft: 30 },
+    { name: 'Safe Harbor Refresh', date: 'Jan 15, 2026', status: 'complete', daysLeft: 0 },
+];
+
+const recentClients = [
+    { name: 'Acme Corporation', employees: 1250, status: 'compliant', lastSync: '2 hours ago' },
+    { name: 'TechStart Inc.', employees: 342, status: 'review', lastSync: '5 hours ago' },
+    { name: 'Global Services LLC', employees: 890, status: 'compliant', lastSync: '1 day ago' },
+];
+
+const riskAlerts = [
+    { type: 'warning', title: 'Coverage Gap Detected', description: '3 employees missing coverage for January', client: 'TechStart Inc.' },
+    { type: 'info', title: 'Rate Update Available', description: '2026 affordability thresholds published', client: 'All Clients' },
+];
 
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -30,146 +78,63 @@ const stagger = {
     }
 };
 
-const portfolioStats = [
-    {
-        label: 'Total Clients',
-        value: '24',
-        change: '+3',
-        trend: 'up',
-        icon: Building2,
-        color: '#0D9488'
-    },
-    {
-        label: 'Employees Managed',
-        value: '12,847',
-        change: '+847',
-        trend: 'up',
-        icon: Users,
-        color: '#0284C7'
-    },
-    {
-        label: 'Compliance Score',
-        value: '94.2%',
-        change: '+2.1%',
-        trend: 'up',
-        icon: CheckCircle2,
-        color: '#059669'
-    },
-    {
-        label: 'Open Risks',
-        value: '7',
-        change: '-2',
-        trend: 'down',
-        icon: AlertTriangle,
-        color: '#D97706'
-    },
-];
-
-const upcomingDeadlines = [
-    { name: '1095-C Distribution', date: 'Jan 31, 2026', status: 'upcoming', daysLeft: 4 },
-    { name: 'Q4 ACA Filing', date: 'Feb 28, 2026', status: 'safe', daysLeft: 32 },
-    { name: '1094-C Submission', date: 'Mar 31, 2026', status: 'safe', daysLeft: 63 },
-];
-
-const recentClients = [
-    { name: 'Apex Manufacturing', employees: 2340, status: 'compliant', lastSync: '2 hours ago' },
-    { name: 'Horizon Healthcare', employees: 1820, status: 'at_risk', lastSync: '4 hours ago' },
-    { name: 'Summit Logistics', employees: 890, status: 'compliant', lastSync: '6 hours ago' },
-    { name: 'Coastal Energy', employees: 1560, status: 'pending_review', lastSync: '1 day ago' },
-];
-
-const riskAlerts = [
-    {
-        client: 'Horizon Healthcare',
-        issue: '23 employees missing FTE determination',
-        severity: 'high',
-        action: 'Review Required'
-    },
-    {
-        client: 'Coastal Energy',
-        issue: 'Data sync failed - credentials expired',
-        severity: 'medium',
-        action: 'Reconnect HRIS'
-    },
-    {
-        client: 'Metro Services',
-        issue: 'Affordability threshold exceeded for 5 employees',
-        severity: 'low',
-        action: 'Verify Premiums'
-    },
-];
-
 function StatusBadge({ status }: { status: string }) {
-    const config = {
-        compliant: { label: 'Compliant', bg: 'bg-[#059669]/10', text: 'text-[#059669]', border: 'border-[#059669]/25' },
-        at_risk: { label: 'At Risk', bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]/25' },
-        non_compliant: { label: 'Non-Compliant', bg: 'bg-[#DC2626]/10', text: 'text-[#DC2626]', border: 'border-[#DC2626]/25' },
-        pending_review: { label: 'Pending Review', bg: 'bg-[#0284C7]/10', text: 'text-[#0284C7]', border: 'border-[#0284C7]/25' },
-    }[status] || { label: status, bg: 'bg-[#64748B]/10', text: 'text-[#64748B]', border: 'border-[#64748B]/25' };
-
-    return (
-        <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold ${config.bg} ${config.text} border ${config.border}`}>
-            {config.label}
-        </span>
-    );
-}
-
-function SeverityBadge({ severity }: { severity: string }) {
-    const config = {
-        high: { label: 'High', bg: 'bg-[#DC2626]/10', text: 'text-[#DC2626]', border: 'border-[#DC2626]/25' },
-        medium: { label: 'Medium', bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]/25' },
-        low: { label: 'Low', bg: 'bg-[#0284C7]/10', text: 'text-[#0284C7]', border: 'border-[#0284C7]/25' },
-    }[severity] || { label: severity, bg: 'bg-[#64748B]/10', text: 'text-[#64748B]', border: 'border-[#64748B]/25' };
-
-    return (
-        <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold ${config.bg} ${config.text} border ${config.border}`}>
-            {config.label}
-        </span>
-    );
+    const configs: Record<string, { label: string; className: string }> = {
+        'compliant': { label: 'Compliant', className: 'badge badge--success' },
+        'on-track': { label: 'On Track', className: 'badge badge--success' },
+        'review': { label: 'Review', className: 'badge badge--warning' },
+        'attention': { label: 'Attention', className: 'badge badge--warning' },
+        'complete': { label: 'Complete', className: 'badge badge--info' },
+    };
+    const config = configs[status] || { label: status, className: 'badge' };
+    return <span className={config.className}>{config.label}</span>;
 }
 
 export default function DashboardPage() {
     return (
-        <div className="space-y-8">
+        <div className="space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-[#0F172A]">Dashboard</h1>
-                    <p className="text-[#64748B] mt-1">Overview of your compliance portfolio</p>
+                    <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Dashboard</h1>
+                    <p style={{ color: 'var(--text-muted)' }}>Welcome back. Here&apos;s your compliance overview.</p>
                 </div>
-                <Link href="/onboard" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-[#0D9488] rounded-lg hover:bg-[#0F766E] transition-colors shadow-sm">
+                <Link
+                    href="/clients/new"
+                    className="btn-primary"
+                >
+                    <Building2 className="w-4 h-4" />
                     Add Client
-                    <ArrowRight className="w-4 h-4" />
                 </Link>
             </div>
 
-            {/* Portfolio Stats */}
+            {/* Stats Grid */}
             <motion.div
                 variants={stagger}
                 initial="hidden"
                 animate="visible"
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
             >
-                {portfolioStats.map((stat, i) => (
+                {stats.map((stat, i) => (
                     <motion.div
                         key={i}
                         variants={fadeInUp}
-                        className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm hover:shadow-md hover:border-[#CBD5E1] transition-all"
+                        className="metric-card"
                     >
-                        <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-start justify-between mb-3">
                             <div
                                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                style={{ background: `${stat.color}15` }}
+                                style={{ background: 'var(--color-info-muted)' }}
                             >
-                                <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
+                                <stat.icon className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
                             </div>
-                            <div className={`flex items-center gap-1 text-xs font-semibold ${stat.trend === 'up' ? 'text-[#059669]' : 'text-[#DC2626]'}`}>
+                            <span className={`metric-trend ${stat.trend === 'up' ? 'metric-trend--up' : 'metric-trend--down'}`}>
                                 {stat.trend === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                                 {stat.change}
-                            </div>
+                            </span>
                         </div>
-                        <div className="text-3xl font-bold text-[#0F172A] font-mono">{stat.value}</div>
-                        <div className="text-sm text-[#64748B] mt-1">{stat.label}</div>
+                        <div className="metric-value">{stat.value}</div>
+                        <div className="metric-label">{stat.label}</div>
                     </motion.div>
                 ))}
             </motion.div>
@@ -181,107 +146,128 @@ export default function DashboardPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm"
+                    className="glass-card p-6 lg:col-span-2"
                 >
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-[#0F172A] flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-[#0D9488]" />
+                        <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                            <Calendar className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
                             Upcoming Deadlines
                         </h2>
+                        <Link href="/calendar" className="text-sm font-medium flex items-center gap-1" style={{ color: 'var(--accent-primary)' }}>
+                            View All <ArrowRight className="w-4 h-4" />
+                        </Link>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         {upcomingDeadlines.map((deadline, i) => (
                             <div
                                 key={i}
-                                className="flex items-center justify-between p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]"
+                                className="flex items-center justify-between p-4 rounded-lg transition-colors"
+                                style={{ background: 'var(--hover-overlay)' }}
                             >
-                                <div>
-                                    <div className="text-sm font-medium text-[#0F172A]">{deadline.name}</div>
-                                    <div className="text-xs text-[#64748B] mt-1">{deadline.date}</div>
+                                <div className="flex items-center gap-4">
+                                    <div
+                                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                                        style={{ background: 'var(--color-warning-muted)' }}
+                                    >
+                                        <FileCheck className="w-5 h-5" style={{ color: 'var(--color-warning)' }} />
+                                    </div>
+                                    <div>
+                                        <div className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{deadline.name}</div>
+                                        <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Due: {deadline.date}</div>
+                                    </div>
                                 </div>
-                                <div className={`text-xs font-semibold px-2 py-1 rounded ${deadline.daysLeft <= 7 ? 'bg-[#D97706]/10 text-[#D97706]' : 'bg-[#F1F5F9] text-[#64748B]'}`}>
-                                    {deadline.daysLeft} days
+                                <div className="flex items-center gap-3">
+                                    {deadline.daysLeft > 0 && (
+                                        <span className="text-sm font-mono" style={{ color: 'var(--text-dim)' }}>
+                                            {deadline.daysLeft}d left
+                                        </span>
+                                    )}
+                                    <StatusBadge status={deadline.status} />
                                 </div>
                             </div>
                         ))}
                     </div>
                 </motion.div>
 
-                {/* Recent Clients */}
+                {/* Risk Alerts */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm lg:col-span-2"
+                    className="glass-card p-6"
                 >
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-[#0F172A] flex items-center gap-2">
-                            <Building2 className="w-5 h-5 text-[#0D9488]" />
-                            Recent Clients
-                        </h2>
-                        <Link href="/clients" className="text-sm text-[#0D9488] hover:underline flex items-center gap-1 font-medium">
-                            View All <ChevronRight className="w-4 h-4" />
-                        </Link>
+                    <div className="flex items-center gap-2 mb-6">
+                        <AlertTriangle className="w-5 h-5" style={{ color: 'var(--color-warning)' }} />
+                        <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Risk Alerts</h2>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-[#E2E8F0]">
-                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Client</th>
-                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Employees</th>
-                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Status</th>
-                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Last Sync</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {recentClients.map((client, i) => (
-                                    <tr key={i} className="border-b border-[#F1F5F9] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
-                                        <td className="py-3 px-4 text-sm font-medium text-[#0F172A]">{client.name}</td>
-                                        <td className="py-3 px-4 text-sm font-mono text-[#334155]">{client.employees.toLocaleString()}</td>
-                                        <td className="py-3 px-4"><StatusBadge status={client.status} /></td>
-                                        <td className="py-3 px-4 text-sm text-[#64748B]">{client.lastSync}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="space-y-3">
+                        {riskAlerts.map((alert, i) => (
+                            <div
+                                key={i}
+                                className="p-4 rounded-lg border transition-colors"
+                                style={{
+                                    background: alert.type === 'warning' ? 'var(--color-warning-muted)' : 'var(--color-info-muted)',
+                                    borderColor: 'var(--card-border)'
+                                }}
+                            >
+                                <div className="text-sm font-medium mb-1" style={{ color: 'var(--text-primary)' }}>{alert.title}</div>
+                                <div className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>{alert.description}</div>
+                                <div className="text-xs font-medium" style={{ color: 'var(--accent-primary)' }}>{alert.client}</div>
+                            </div>
+                        ))}
                     </div>
                 </motion.div>
             </div>
 
-            {/* Risk Alerts */}
+            {/* Recent Clients */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm"
+                className="glass-card p-6"
             >
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-semibold text-[#0F172A] flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5 text-[#D97706]" />
-                        Risk Alerts
+                    <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+                        <Activity className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
+                        Recent Clients
                     </h2>
-                    <Link href="/compliance" className="text-sm text-[#0D9488] hover:underline flex items-center gap-1 font-medium">
-                        Compliance Center <ChevronRight className="w-4 h-4" />
+                    <Link href="/clients" className="text-sm font-medium flex items-center gap-1" style={{ color: 'var(--accent-primary)' }}>
+                        View All <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
-                <div className="space-y-3">
-                    {riskAlerts.map((alert, i) => (
-                        <div
-                            key={i}
-                            className="flex items-center justify-between p-4 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[#CBD5E1] transition-colors"
-                        >
-                            <div className="flex items-center gap-4">
-                                <SeverityBadge severity={alert.severity} />
-                                <div>
-                                    <div className="text-sm font-medium text-[#0F172A]">{alert.client}</div>
-                                    <div className="text-xs text-[#64748B] mt-1">{alert.issue}</div>
-                                </div>
-                            </div>
-                            <button className="px-4 py-2 text-sm font-medium text-[#0F172A] bg-white border border-[#CBD5E1] rounded-lg hover:bg-[#F1F5F9] transition-colors">
-                                {alert.action}
-                            </button>
-                        </div>
-                    ))}
+                <div className="overflow-x-auto">
+                    <table className="data-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Employees</th>
+                                <th>Status</th>
+                                <th>Last Sync</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {recentClients.map((client, i) => (
+                                <tr key={i}>
+                                    <td>
+                                        <div className="flex items-center gap-3">
+                                            <div
+                                                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                                style={{ background: 'var(--color-info-muted)' }}
+                                            >
+                                                <Building2 className="w-4 h-4" style={{ color: 'var(--accent-primary)' }} />
+                                            </div>
+                                            <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{client.name}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span className="font-mono">{client.employees.toLocaleString()}</span>
+                                    </td>
+                                    <td><StatusBadge status={client.status} /></td>
+                                    <td style={{ color: 'var(--text-dim)' }}>{client.lastSync}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </motion.div>
 
@@ -293,20 +279,23 @@ export default function DashboardPage() {
                 className="grid grid-cols-2 lg:grid-cols-4 gap-4"
             >
                 {[
-                    { label: 'New Client Onboarding', icon: Building2, href: '/onboard' },
-                    { label: 'Run Compliance Check', icon: FileCheck, href: '/compliance' },
-                    { label: 'View Data Refinery', icon: Clock, href: '/refinery' },
+                    { label: 'Run Compliance Check', icon: Shield, href: '/compliance' },
+                    { label: 'Workflow Builder', icon: DollarSign, href: '/workflow-builder' },
                     { label: 'Generate Reports', icon: FileCheck, href: '/reports' },
+                    { label: 'Self-Insured Analytics', icon: TrendingUp, href: '/self-insured' },
                 ].map((action, i) => (
                     <Link
                         key={i}
                         href={action.href}
-                        className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex items-center gap-3 hover:border-[#0D9488] hover:shadow-md transition-all group"
+                        className="glass-card p-4 flex items-center gap-3 group"
                     >
-                        <div className="w-10 h-10 rounded-lg bg-[#0D9488]/10 flex items-center justify-center">
-                            <action.icon className="w-5 h-5 text-[#0D9488]" />
+                        <div
+                            className="w-10 h-10 rounded-lg flex items-center justify-center"
+                            style={{ background: 'var(--color-info-muted)' }}
+                        >
+                            <action.icon className="w-5 h-5" style={{ color: 'var(--accent-primary)' }} />
                         </div>
-                        <span className="text-sm font-medium text-[#334155] group-hover:text-[#0F172A] transition-colors">
+                        <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                             {action.label}
                         </span>
                     </Link>
