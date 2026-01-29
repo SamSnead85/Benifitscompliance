@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-// Animation variants
 const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
@@ -31,7 +30,6 @@ const stagger = {
     }
 };
 
-// Sample data
 const portfolioStats = [
     {
         label: 'Total Clients',
@@ -39,7 +37,7 @@ const portfolioStats = [
         change: '+3',
         trend: 'up',
         icon: Building2,
-        color: 'var(--color-synapse-teal)'
+        color: '#0D9488'
     },
     {
         label: 'Employees Managed',
@@ -47,7 +45,7 @@ const portfolioStats = [
         change: '+847',
         trend: 'up',
         icon: Users,
-        color: 'var(--color-synapse-cyan)'
+        color: '#0284C7'
     },
     {
         label: 'Compliance Score',
@@ -55,7 +53,7 @@ const portfolioStats = [
         change: '+2.1%',
         trend: 'up',
         icon: CheckCircle2,
-        color: 'var(--color-success)'
+        color: '#059669'
     },
     {
         label: 'Open Risks',
@@ -63,7 +61,7 @@ const portfolioStats = [
         change: '-2',
         trend: 'down',
         icon: AlertTriangle,
-        color: 'var(--color-warning)'
+        color: '#D97706'
     },
 ];
 
@@ -103,23 +101,31 @@ const riskAlerts = [
 
 function StatusBadge({ status }: { status: string }) {
     const config = {
-        compliant: { label: 'Compliant', className: 'badge--success' },
-        at_risk: { label: 'At Risk', className: 'badge--warning' },
-        non_compliant: { label: 'Non-Compliant', className: 'badge--critical' },
-        pending_review: { label: 'Pending Review', className: 'badge--info' },
-    }[status] || { label: status, className: 'badge--info' };
+        compliant: { label: 'Compliant', bg: 'bg-[#059669]/10', text: 'text-[#059669]', border: 'border-[#059669]/25' },
+        at_risk: { label: 'At Risk', bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]/25' },
+        non_compliant: { label: 'Non-Compliant', bg: 'bg-[#DC2626]/10', text: 'text-[#DC2626]', border: 'border-[#DC2626]/25' },
+        pending_review: { label: 'Pending Review', bg: 'bg-[#0284C7]/10', text: 'text-[#0284C7]', border: 'border-[#0284C7]/25' },
+    }[status] || { label: status, bg: 'bg-[#64748B]/10', text: 'text-[#64748B]', border: 'border-[#64748B]/25' };
 
-    return <span className={`badge ${config.className}`}>{config.label}</span>;
+    return (
+        <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold ${config.bg} ${config.text} border ${config.border}`}>
+            {config.label}
+        </span>
+    );
 }
 
 function SeverityBadge({ severity }: { severity: string }) {
     const config = {
-        high: { label: 'High', className: 'badge--critical' },
-        medium: { label: 'Medium', className: 'badge--warning' },
-        low: { label: 'Low', className: 'badge--info' },
-    }[severity] || { label: severity, className: 'badge--info' };
+        high: { label: 'High', bg: 'bg-[#DC2626]/10', text: 'text-[#DC2626]', border: 'border-[#DC2626]/25' },
+        medium: { label: 'Medium', bg: 'bg-[#D97706]/10', text: 'text-[#D97706]', border: 'border-[#D97706]/25' },
+        low: { label: 'Low', bg: 'bg-[#0284C7]/10', text: 'text-[#0284C7]', border: 'border-[#0284C7]/25' },
+    }[severity] || { label: severity, bg: 'bg-[#64748B]/10', text: 'text-[#64748B]', border: 'border-[#64748B]/25' };
 
-    return <span className={`badge ${config.className}`}>{config.label}</span>;
+    return (
+        <span className={`inline-flex items-center px-2.5 py-1 rounded text-xs font-semibold ${config.bg} ${config.text} border ${config.border}`}>
+            {config.label}
+        </span>
+    );
 }
 
 export default function DashboardPage() {
@@ -128,10 +134,10 @@ export default function DashboardPage() {
             {/* Page Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-                    <p className="text-[var(--color-steel)] mt-1">Overview of your compliance portfolio</p>
+                    <h1 className="text-2xl font-bold text-[#0F172A]">Dashboard</h1>
+                    <p className="text-[#64748B] mt-1">Overview of your compliance portfolio</p>
                 </div>
-                <Link href="/onboard" className="btn-primary">
+                <Link href="/onboard" className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-[#0D9488] rounded-lg hover:bg-[#0F766E] transition-colors shadow-sm">
                     Add Client
                     <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -148,24 +154,22 @@ export default function DashboardPage() {
                     <motion.div
                         key={i}
                         variants={fadeInUp}
-                        className="metric-card"
+                        className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm hover:shadow-md hover:border-[#CBD5E1] transition-all"
                     >
                         <div className="flex items-start justify-between mb-4">
                             <div
                                 className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                style={{
-                                    background: `rgba(${stat.color === 'var(--color-synapse-teal)' ? '6, 182, 212' : stat.color === 'var(--color-synapse-cyan)' ? '34, 211, 238' : stat.color === 'var(--color-success)' ? '16, 185, 129' : '245, 158, 11'}, 0.15)`
-                                }}
+                                style={{ background: `${stat.color}15` }}
                             >
                                 <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
                             </div>
-                            <div className={`metric-trend metric-trend--${stat.trend === 'up' ? 'up' : 'down'} flex items-center gap-1`}>
+                            <div className={`flex items-center gap-1 text-xs font-semibold ${stat.trend === 'up' ? 'text-[#059669]' : 'text-[#DC2626]'}`}>
                                 {stat.trend === 'up' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                                 {stat.change}
                             </div>
                         </div>
-                        <div className="metric-value">{stat.value}</div>
-                        <div className="metric-label">{stat.label}</div>
+                        <div className="text-3xl font-bold text-[#0F172A] font-mono">{stat.value}</div>
+                        <div className="text-sm text-[#64748B] mt-1">{stat.label}</div>
                     </motion.div>
                 ))}
             </motion.div>
@@ -177,26 +181,25 @@ export default function DashboardPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="glass-card p-6"
+                    className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm"
                 >
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <Calendar className="w-5 h-5 text-[var(--color-synapse-teal)]" />
+                        <h2 className="text-lg font-semibold text-[#0F172A] flex items-center gap-2">
+                            <Calendar className="w-5 h-5 text-[#0D9488]" />
                             Upcoming Deadlines
                         </h2>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {upcomingDeadlines.map((deadline, i) => (
                             <div
                                 key={i}
-                                className="flex items-center justify-between p-3 rounded-lg bg-[var(--glass-bg-light)] border border-[var(--glass-border)]"
+                                className="flex items-center justify-between p-3 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]"
                             >
                                 <div>
-                                    <div className="text-sm font-medium text-white">{deadline.name}</div>
-                                    <div className="text-xs text-[var(--color-steel)] mt-1">{deadline.date}</div>
+                                    <div className="text-sm font-medium text-[#0F172A]">{deadline.name}</div>
+                                    <div className="text-xs text-[#64748B] mt-1">{deadline.date}</div>
                                 </div>
-                                <div className={`text-xs font-semibold ${deadline.daysLeft <= 7 ? 'text-[var(--color-warning)]' : 'text-[var(--color-steel)]'
-                                    }`}>
+                                <div className={`text-xs font-semibold px-2 py-1 rounded ${deadline.daysLeft <= 7 ? 'bg-[#D97706]/10 text-[#D97706]' : 'bg-[#F1F5F9] text-[#64748B]'}`}>
                                     {deadline.daysLeft} days
                                 </div>
                             </div>
@@ -209,37 +212,39 @@ export default function DashboardPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="glass-card p-6 lg:col-span-2"
+                    className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm lg:col-span-2"
                 >
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <Building2 className="w-5 h-5 text-[var(--color-synapse-teal)]" />
+                        <h2 className="text-lg font-semibold text-[#0F172A] flex items-center gap-2">
+                            <Building2 className="w-5 h-5 text-[#0D9488]" />
                             Recent Clients
                         </h2>
-                        <Link href="/clients" className="text-sm text-[var(--color-synapse-teal)] hover:underline flex items-center gap-1">
+                        <Link href="/clients" className="text-sm text-[#0D9488] hover:underline flex items-center gap-1 font-medium">
                             View All <ChevronRight className="w-4 h-4" />
                         </Link>
                     </div>
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Employees</th>
-                                <th>Status</th>
-                                <th>Last Sync</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {recentClients.map((client, i) => (
-                                <tr key={i} className="cursor-pointer">
-                                    <td className="font-medium">{client.name}</td>
-                                    <td className="font-mono">{client.employees.toLocaleString()}</td>
-                                    <td><StatusBadge status={client.status} /></td>
-                                    <td className="text-[var(--color-steel)]">{client.lastSync}</td>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="border-b border-[#E2E8F0]">
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Client</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Employees</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Status</th>
+                                    <th className="text-left py-3 px-4 text-xs font-semibold text-[#64748B] uppercase tracking-wider">Last Sync</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {recentClients.map((client, i) => (
+                                    <tr key={i} className="border-b border-[#F1F5F9] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
+                                        <td className="py-3 px-4 text-sm font-medium text-[#0F172A]">{client.name}</td>
+                                        <td className="py-3 px-4 text-sm font-mono text-[#334155]">{client.employees.toLocaleString()}</td>
+                                        <td className="py-3 px-4"><StatusBadge status={client.status} /></td>
+                                        <td className="py-3 px-4 text-sm text-[#64748B]">{client.lastSync}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </motion.div>
             </div>
 
@@ -248,14 +253,14 @@ export default function DashboardPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="glass-card p-6"
+                className="bg-white rounded-xl border border-[#E2E8F0] p-6 shadow-sm"
             >
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5 text-[var(--color-warning)]" />
+                    <h2 className="text-lg font-semibold text-[#0F172A] flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-[#D97706]" />
                         Risk Alerts
                     </h2>
-                    <Link href="/compliance" className="text-sm text-[var(--color-synapse-teal)] hover:underline flex items-center gap-1">
+                    <Link href="/compliance" className="text-sm text-[#0D9488] hover:underline flex items-center gap-1 font-medium">
                         Compliance Center <ChevronRight className="w-4 h-4" />
                     </Link>
                 </div>
@@ -263,16 +268,16 @@ export default function DashboardPage() {
                     {riskAlerts.map((alert, i) => (
                         <div
                             key={i}
-                            className="flex items-center justify-between p-4 rounded-lg bg-[var(--glass-bg-light)] border border-[var(--glass-border)] hover:border-[var(--glass-border-hover)] transition-colors"
+                            className="flex items-center justify-between p-4 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[#CBD5E1] transition-colors"
                         >
                             <div className="flex items-center gap-4">
                                 <SeverityBadge severity={alert.severity} />
                                 <div>
-                                    <div className="text-sm font-medium text-white">{alert.client}</div>
-                                    <div className="text-xs text-[var(--color-steel)] mt-1">{alert.issue}</div>
+                                    <div className="text-sm font-medium text-[#0F172A]">{alert.client}</div>
+                                    <div className="text-xs text-[#64748B] mt-1">{alert.issue}</div>
                                 </div>
                             </div>
-                            <button className="btn-secondary text-sm px-4 py-2">
+                            <button className="px-4 py-2 text-sm font-medium text-[#0F172A] bg-white border border-[#CBD5E1] rounded-lg hover:bg-[#F1F5F9] transition-colors">
                                 {alert.action}
                             </button>
                         </div>
@@ -296,10 +301,12 @@ export default function DashboardPage() {
                     <Link
                         key={i}
                         href={action.href}
-                        className="glass-card p-4 flex items-center gap-3 hover:border-[var(--color-synapse-teal)] group"
+                        className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex items-center gap-3 hover:border-[#0D9488] hover:shadow-md transition-all group"
                     >
-                        <action.icon className="w-5 h-5 text-[var(--color-synapse-teal)]" />
-                        <span className="text-sm text-[var(--color-silver)] group-hover:text-white transition-colors">
+                        <div className="w-10 h-10 rounded-lg bg-[#0D9488]/10 flex items-center justify-center">
+                            <action.icon className="w-5 h-5 text-[#0D9488]" />
+                        </div>
+                        <span className="text-sm font-medium text-[#334155] group-hover:text-[#0F172A] transition-colors">
                             {action.label}
                         </span>
                     </Link>
